@@ -1,0 +1,29 @@
+- name: update hostname
+  shell: echo {{ SERVER_NAME }} > /etc/hostname
+  tags: init
+
+- name: disable selinux
+  shell: echo "SELINUX=disabled" > /etc/selinux/config && \
+         echo "SELINUXTYPE=targeted" >> /etc/selinux/config
+  tags: init
+
+
+- name: update kernel
+  shell: rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org; \
+         rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
+  tags: kernel
+
+- name: install latest kernel
+  yum: name={{ item }} enablerepo=elrepo-kernel state=latest
+  with_items:
+  - "kernel-ml-devel"
+  - "kernel-ml"
+  tags: kernel
+
+- name: grub2-set-default 0 
+  shell: grub2-set-default 0
+  tags: kernel
+
+- name: reboot
+  shell: reboot
+  tags: init

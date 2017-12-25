@@ -1,0 +1,17 @@
+[Unit]
+Description=Etcd Service
+After=network.target
+
+[Service]
+Environment=ETCD_DATA_DIR={{ etcd_lib_dir }}default
+EnvironmentFile=-{{ etcd_dir }}etcd.conf
+Type=notify
+User=root
+PermissionsStartOnly=true
+ExecStart=/usr/local/bin/etcd
+Restart=on-failure
+RestartSec=10
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

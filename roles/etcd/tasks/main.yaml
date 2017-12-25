@@ -1,0 +1,29 @@
+- name: sync etcd bin
+  copy: src=bin/{{ item }} dest={{ bin_dir }} mode=0755
+  with_items:
+  - "etcd"
+  - "etcdctl"
+
+- name: sync etcd.sh
+  template: src=env/etcd.sh dest=/etc/profile.d/etcd.sh
+
+- name: sync etcd.conf
+  template: src=etcd/etcd.conf dest={{ etcd_dir }}etcd.conf
+
+- name: sync etcd.service
+  template: src=etcd/{{ item }} dest={{ service_dir }}{{ item }}
+  with_items:
+  - "etcd.service"
+
+- name: start etcd
+  shell: systemctl daemon-reload && \
+         systemctl enable etcd && \
+         systemctl restart etcd && \
+         systemctl status etcd 
+
+- name: check etcd service
+  shell: etcdctl \
+         --cacert={{ ca_dir }}ca.pem \
+         --cert={{ etcd_ca_dir }}etcd.pem \
+         --key={{ etcd_ca_dir }}etcd-key.pem \
+         endpoint health

@@ -1,0 +1,54 @@
+- name: kubectl create clusterrolebinding kubelet-bootstrap
+  shell: "sleep 60 && {{ bin_dir }}kubectl create clusterrolebinding kubelet-bootstrap \
+        --clusterrole=system:node --user=kubelet-bootstrap"
+  when: MASTER is defined and MASTER == "true"
+  ignore_errors: true
+
+- name: kubectl certificate approve
+  shell: "sleep 30 && kubectl get csr | grep -v 'NAME' | awk '{print $1}' | xargs kubectl certificate approve"
+  when: MASTER is defined and MASTER == "true"
+  ignore_errors: true
+
+- name: sync templates addon
+  template: src=addon/{{ item }} dest={{ k8s_addon_dir }}{{ item }}
+  with_items:
+  - "calico-kube-controllers.yaml"
+  - "kube-dns.yaml"
+  - "tomcat.yaml"
+
+- name: sync files addon
+  synchronize: src=addon/{{ item }} dest={{ k8s_addon_dir }}
+  with_items:
+  - "dashboard"
+  - "monitor"
+#  - "heapster"
+  - "ingress"
+
+- name: kubectl apply -f main
+  shell: kubectl apply -f {{ k8s_addon_dir }}{{ item }}
+  with_items:
+  - "calico-kube-controllers.yaml"
+  - "kube-dns.yaml"
+  when: MASTER is defined and MASTER == "true"
+
+- name: clone prometheus-operator
+  git: repo=https://github.com/coreos/prometheus-operator.git dest={{ k8s_addon_dir }}prometheus-operator
+  when: MASTER is defined and MASTER == "true"
+
+- name: replace gcr.io
+  shell: sed -i 's/gcr.io\/google_containers/njqaaa/g' {{ k8s_addon_dir }}prometheus-operator/contrib/kube-prometheus/manifests/kube-state-metrics/kube-state-metrics-deployment.yaml {{ k8s_addon_dir }}prometheus-operator/contrib/kube-prometheus/manifests/metrics-server/metrics-server-deployment.yaml
+  when: MASTER is defined and MASTER == "true"
+
+
+- name: kubectl apply -f  
+  shell: kubectl apply -f {{ k8s_addon_dir }}{{ item }}
+  with_items:
+  - "dashboard"
+#  - "heapster"
+  - "ingress"
+  - "tomcat.yaml"
+  when: MASTER is defined and MASTER == "true"
+
+- name: create admin.p12
+  shell: openssl pkcs12 -export -in {{ ca_dir }}admin.pem -out {{ ca_dir }}admin.p12 -inkey {{ ca_dir }}admin-key.pem -passout pass:{{ BASIC_AUTH_PASS }}
+  when: MASTER is defined and MASTER == "true"

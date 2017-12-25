@@ -1,0 +1,33 @@
+- name: swapoff -a
+  shell: swapoff -a
+
+- name: stop firewalld
+  shell: systemctl stop firewalld.service; \
+         systemctl disable firewalld.service        
+
+- name: sync hosts
+  copy: src=hosts dest=/etc/hosts
+
+- name: sync hosts
+  copy: src=sysctl.d/k8s.conf dest=/etc/sysctl.d/k8s.conf
+
+- name: sysctl -p
+  shell: sysctl -p
+
+- name: initialize dir
+  file: name={{ item }} state=directory mode=0755
+  with_items:
+  - "{{ bin_dir }}"
+  - "{{ k8s_dir }}"
+  - "{{ k8s_addon_dir }}"
+  - "{{ k8s_manifests_dir }}"
+  - "{{ ca_dir }}"
+  - "{{ etcd_dir }}"
+  - "{{ etcd_ca_dir }}"
+  - "{{ etcd_lib_dir }}"
+  - "{{ calico_dir }}"
+  - "{{ cni_dir }}"
+  - "{{ calico_dir }}"
+  - "{{ calico_log }}"
+  - "{{ kubelet_lib_dir }}"
+  - "{{ kube_proxy_lib_dir }}"

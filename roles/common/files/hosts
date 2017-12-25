@@ -1,0 +1,7 @@
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+10.28.50.60 k8s-etcd-1
+10.28.50.61 k8s-etcd-2
+10.28.50.62 k8s-etcd-3
+10.28.50.71 k8s-node-1
+10.28.50.72 k8s-node-2

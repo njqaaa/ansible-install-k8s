@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    scheduler.alpha.kubernetes.io/critical-pod: ""
+  labels:
+    component: kube-scheduler
+    tier: control-plane
+  name: kube-scheduler
+  namespace: kube-system
+spec:
+  hostNetwork: true
+  containers:
+  - name: kube-scheduler
+    image: njqaaa/kube-scheduler-amd64:v1.8.5
+    command:
+      - kube-scheduler
+      - --v=2
+      - --logtostderr=true
+      - --address=127.0.0.1
+      - --leader-elect=true
+      - --master=http://127.0.0.1:8080
+    livenessProbe:
+      failureThreshold: 8
+      httpGet:
+        host: 127.0.0.1
+        path: /healthz
+        port: 10251
+        scheme: HTTP
+      initialDelaySeconds: 15
+      timeoutSeconds: 15
+    resources:
+      requests:
+        cpu: 100m
+    volumeMounts:
+    - mountPath: /etc/localtime
+      name: tz-config
+      readOnly: true
+  volumes:
+  - hostPath:
+      path: /usr/share/zoneinfo/Asia/Shanghai
+      type: FileOrCreate
+    name: tz-config

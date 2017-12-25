@@ -1,0 +1,55 @@
+# k8s-master与etcd公用3台服务器
+[k8s-master-1]
+10.28.50.60
+
+[k8s-master:children]
+k8s-etcd
+
+[k8s-node]
+10.28.50.71 SERVER_NAME=k8s-node-1
+10.28.50.72 SERVER_NAME=k8s-node-2
+
+[k8s-etcd]
+10.28.50.60 SERVER_NAME=k8s-etcd-1 MASTER=true
+10.28.50.61 SERVER_NAME=k8s-etcd-2
+10.28.50.62 SERVER_NAME=k8s-etcd-3
+
+
+[k8s-cluster:children]
+k8s-node
+k8s-master
+k8s-etcd
+
+[all:vars]
+KUBE_APISERVER_DOMAIN="k8s-apiserver.test.fruitday.com"
+#KUBE_APISERVER="https://k8s-apiserver.test.fruitday.com:6443"
+KUBE_APISERVER="https://{{KUBE_APISERVER_DOMAIN}}:6443"
+SERVICE_CIDR="10.244.0.0/16"
+CLUSTER_CIDR="10.96.0.0/16"
+CLUSTER_KUBERNETES_SVC_IP="10.244.0.1"
+CLUSTER_DNS_SVC_IP="10.244.0.2"
+NODE_PORT_RANGE="20000-40000"
+CLUSTER_DNS_DOMAIN="cluster.local."
+ETCD_NODES="k8s-etcd-1=https://k8s-etcd-1:2380,k8s-etcd-2=https://k8s-etcd-2:2380,k8s-etcd-3=https://k8s-etcd-3:2380"
+ETCD_ENDPOINTS="https://k8s-etcd-1:2379,https://k8s-etcd-2:2379,https://k8s-etcd-3:2379"
+#网卡名
+IP_METHOD="ens192"
+
+bin_dir="/usr/local/bin/"
+k8s_dir='/etc/kubernetes/'
+k8s_addon_dir='/etc/kubernetes/addon/'
+k8s_manifests_dir='/etc/kubernetes/manifests/'
+ca_dir="/etc/kubernetes/ssl/"
+etcd_dir='/etc/etcd/'
+etcd_ca_dir="/etc/etcd/ssl/"
+etcd_lib_dir='/var/lib/etcd/'
+calico_dir='/etc/calico/'
+calico_log="/var/log/calico"
+cni_dir="/etc/cni/net.d/"
+kubelet_lib_dir='/var/lib/kubelet/'
+kube_proxy_lib_dir='/var/lib/kube-proxy/'
+service_dir='/lib/systemd/system/'
+
+# BASIC_AUTH_USER 账号密码验证功能，修改basic-auth.csv
+BASIC_AUTH_USER="admin"
+# BASIC_AUTH_PASS admin.p12 密码

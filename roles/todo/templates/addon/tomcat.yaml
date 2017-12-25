@@ -1,0 +1,31 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: tomcat
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        run: tomcat
+    spec:
+      containers:
+      - name: tomcat
+        image: tomcat
+        args:
+        ports:
+        - containerPort: 8080
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: tomcat
+spec:
+  ports:
+  - name: tomcat-svc
+    port: 8080
+    targetPort: 8080
+  selector:
+    app: tomcat
