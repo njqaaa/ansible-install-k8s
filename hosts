@@ -21,6 +21,7 @@ k8s-master
 k8s-etcd
 
 [all:vars]
+k8s_cluster='k8s-etcd-1 k8s-etcd-2 k8s-etcd-3'
 KUBE_APISERVER_DOMAIN="k8s-apiserver.test.fruitday.com"
 #KUBE_APISERVER="https://k8s-apiserver.test.fruitday.com:6443"
 KUBE_APISERVER="https://{{KUBE_APISERVER_DOMAIN}}:6443"
