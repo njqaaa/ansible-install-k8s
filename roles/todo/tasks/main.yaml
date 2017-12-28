@@ -9,6 +9,11 @@
   when: MASTER is defined and MASTER == "true"
   ignore_errors: true
 
+ - name: kubectl taint masters NoSchedule
+   shell: kubectl taint nodes {{ k8s_cluster }} key=value:NoSchedule
+  when: MASTER is defined and MASTER == "true"
+  ignore_errors: true
+
 - name: sync templates addon
   template: src=addon/{{ item }} dest={{ k8s_addon_dir }}{{ item }}
   with_items:
@@ -34,11 +39,16 @@
 - name: clone prometheus-operator
   git: repo=https://github.com/coreos/prometheus-operator.git dest={{ k8s_addon_dir }}prometheus-operator
   when: MASTER is defined and MASTER == "true"
+  ignore_errors: true
 
 - name: replace gcr.io
   shell: sed -i 's/gcr.io\/google_containers/njqaaa/g' {{ k8s_addon_dir }}prometheus-operator/contrib/kube-prometheus/manifests/kube-state-metrics/kube-state-metrics-deployment.yaml {{ k8s_addon_dir }}prometheus-operator/contrib/kube-prometheus/manifests/metrics-server/metrics-server-deployment.yaml
   when: MASTER is defined and MASTER == "true"
 
+- name: install prometheus
+  shell: cd {{ k8s_addon_dir }}prometheus-operator/contrib/kube-prometheus && \
+         hack/cluster-monitoring/deploy
+  when: MASTER is defined and MASTER == "true"
 
 - name: kubectl apply -f  
   shell: kubectl apply -f {{ k8s_addon_dir }}{{ item }}

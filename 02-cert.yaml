@@ -24,6 +24,13 @@
     - "etcd-key.pem"
     - "etcd.pem"
 
+  - name: sync tls
+    copy: src=roles/cert/files/tls/{{ item }} dest={{ k8s_dir }}{{ item }}
+    with_items:
+    - "bootstrap.kubeconfig"
+    - "kube-proxy.kubeconfig"
+
+
 - hosts: 'k8s-node'
   remote_user: root
   tasks:
@@ -38,7 +45,7 @@
     - "etcd-key.pem"
     - "etcd.pem"
 
-  - name: sync k8s-master tls
+  - name: sync tls
     copy: src=roles/cert/files/tls/{{ item }} dest={{ k8s_dir }}{{ item }}
     with_items:
     - "bootstrap.kubeconfig"
