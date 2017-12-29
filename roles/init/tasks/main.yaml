@@ -12,6 +12,7 @@
   shell: rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org; \
          rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
   tags: kernel
+  ignore_errors: true
 
 - name: install latest kernel
   yum: name={{ item }} enablerepo=elrepo-kernel state=latest
