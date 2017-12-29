@@ -1,4 +1,4 @@
-- hosts: 'k8s-master-1'
+- hosts: 'k8s-master'
   user: root
   roles:
   - cert
@@ -29,7 +29,6 @@
     with_items:
     - "bootstrap.kubeconfig"
     - "kube-proxy.kubeconfig"
-
 
 - hosts: 'k8s-node'
   remote_user: root

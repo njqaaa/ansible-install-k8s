@@ -40,7 +40,8 @@ else
     ansible-playbook -i hosts 00-init.yaml --tags='init'
 fi
 # 等待重启完成
-sleep 120
+until ansible k8s-cluster -i hosts -m shell -a 'w' > /dev/null 2>&1; do sleep 2; printf "."; done
+
 ansible-playbook -i hosts 01-common.yaml
 ansible-playbook -i hosts 02-cert.yaml
 ansible-playbook -i hosts 03-etcd.yaml

@@ -1,17 +1,17 @@
 - name: kubectl create clusterrolebinding kubelet-bootstrap
   shell: "sleep 60 && {{ bin_dir }}kubectl create clusterrolebinding kubelet-bootstrap \
         --clusterrole=system:node --user=kubelet-bootstrap"
-  when: MASTER is defined and MASTER == "true"
+  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
   ignore_errors: true
 
 - name: kubectl certificate approve
   shell: "sleep 30 && kubectl get csr | grep -v 'NAME' | awk '{print $1}' | xargs kubectl certificate approve"
-  when: MASTER is defined and MASTER == "true"
+  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
   ignore_errors: true
 
- - name: kubectl taint masters NoSchedule
-   shell: kubectl taint nodes {{ k8s_cluster }} key=value:NoSchedule
-  when: MASTER is defined and MASTER == "true"
+- name: kubectl taint masters NoSchedule
+  shell: kubectl taint nodes {{ k8s_cluster }} key=value:NoSchedule
+  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
   ignore_errors: true
 
 - name: sync templates addon
@@ -34,21 +34,21 @@
   with_items:
   - "calico-kube-controllers.yaml"
   - "kube-dns.yaml"
-  when: MASTER is defined and MASTER == "true"
+  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
 
 - name: clone prometheus-operator
   git: repo=https://github.com/coreos/prometheus-operator.git dest={{ k8s_addon_dir }}prometheus-operator
-  when: MASTER is defined and MASTER == "true"
+  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
   ignore_errors: true
 
 - name: replace gcr.io
   shell: sed -i 's/gcr.io\/google_containers/njqaaa/g' {{ k8s_addon_dir }}prometheus-operator/contrib/kube-prometheus/manifests/kube-state-metrics/kube-state-metrics-deployment.yaml {{ k8s_addon_dir }}prometheus-operator/contrib/kube-prometheus/manifests/metrics-server/metrics-server-deployment.yaml
-  when: MASTER is defined and MASTER == "true"
+  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
 
 - name: install prometheus
   shell: cd {{ k8s_addon_dir }}prometheus-operator/contrib/kube-prometheus && \
          hack/cluster-monitoring/deploy
-  when: MASTER is defined and MASTER == "true"
+  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
 
 - name: kubectl apply -f  
   shell: kubectl apply -f {{ k8s_addon_dir }}{{ item }}
@@ -57,8 +57,8 @@
 #  - "heapster"
   - "ingress"
   - "tomcat.yaml"
-  when: MASTER is defined and MASTER == "true"
+  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
 
 - name: create admin.p12
   shell: openssl pkcs12 -export -in {{ ca_dir }}admin.pem -out {{ ca_dir }}admin.p12 -inkey {{ ca_dir }}admin-key.pem -passout pass:{{ BASIC_AUTH_PASS }}
-  when: MASTER is defined and MASTER == "true"
+  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
