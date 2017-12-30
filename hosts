@@ -1,15 +1,16 @@
 # k8s-master与etcd公用3台服务器
 [k8s-master]
-10.28.50.60 SERVER_NAME=k8s-master-1 EXEC_MASTER=true # 生产密钥的master
-10.28.50.61 SERVER_NAME=k8s-master-2
-10.28.50.62 SERVER_NAME=k8s-master-3
-
-[k8s-etcd:children]
-k8s-master
+10.28.50.61 SERVER_NAME=k8s-master-1 EXEC_MASTER=true # 生产密钥的master
+10.28.50.62 SERVER_NAME=k8s-master-2
+10.28.50.63 SERVER_NAME=k8s-master-3
 
 [k8s-node]
 10.28.50.71 SERVER_NAME=k8s-node-1
 10.28.50.72 SERVER_NAME=k8s-node-2
+10.28.50.73 SERVER_NAME=k8s-node-3
+
+[k8s-etcd:children]
+k8s-master
 
 [k8s-cluster:children]
 k8s-master
@@ -29,7 +30,7 @@ CLUSTER_DNS_DOMAIN="cluster.local."
 ETCD_NODES="k8s-master-1=https://k8s-master-1:2380,k8s-master-2=https://k8s-master-2:2380,k8s-master-3=https://k8s-master-3:2380"
 ETCD_ENDPOINTS="https://k8s-master-1:2379,https://k8s-master-2:2379,https://k8s-master-3:2379"
 #网卡名
-IP_METHOD="ens192"
+IP_METHOD="eno16780032"
 
 bin_dir="/usr/local/bin/"
 k8s_dir='/etc/kubernetes/'

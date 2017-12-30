@@ -171,8 +171,12 @@
   - "kube-proxy.kubeconfig"
   when: EXEC_MASTER is defined and EXEC_MASTER == "true"
 
-- name: rm ca pki
+- name: rm {{ ca_dir }}*
   shell: rm {{ ca_dir }}*
+  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+
+- name: rm {{ etcd_ca_dir }}*
+  shell: rm {{ etcd_ca_dir }}*
   when: EXEC_MASTER is defined and EXEC_MASTER == "true"
 
 - name: rm cfssl
@@ -182,3 +186,4 @@
   - "cfssljson"
   - "cfssl-certinfo"
   - "kubectl"
+  when: EXEC_MASTER is defined and EXEC_MASTER == "true"

@@ -1,5 +1,6 @@
 #!/bin/bash
 export k8s_version="v1.8.5"
+export ansible_forks_num='6'
 ansible_dir=`pwd`
 k8s_package_path='/tmp/src'
 docker_package_path='/usr/local/src/'
@@ -33,20 +34,16 @@ if [[ $? -ne 0 ]];then
     echo BOOTSTRAP_TOKEN=\"${bootstrap_token}\" >> hosts
 fi
 
-read -p 'update kernel?(y/n)'
-if [[ ${REPLY} == "y" ]];then
-    ansible-playbook -i hosts 00-init.yaml --tags='init,kernel'
-else
-    ansible-playbook -i hosts 00-init.yaml --tags='init'
-fi
+ansible-playbook -i hosts 00-init.yaml -f ${ansible_forks_num}
+echo reboot now
 # 等待重启完成
 until ansible k8s-cluster -i hosts -m shell -a 'w' > /dev/null 2>&1; do sleep 2; printf "."; done
 
-ansible-playbook -i hosts 01-common.yaml
-ansible-playbook -i hosts 02-cert.yaml
-ansible-playbook -i hosts 03-etcd.yaml
-ansible-playbook -i hosts 04-docker.yaml
-ansible-playbook -i hosts 05-calico.yaml
-ansible-playbook -i hosts 06-k8s-master.yaml
-ansible-playbook -i hosts 07-k8s-node.yaml
-ansible-playbook -i hosts 08-todo.yaml
+ansible-playbook -i hosts 01-common.yaml -f ${ansible_forks_num} 
+ansible-playbook -i hosts 02-cert.yaml -f ${ansible_forks_num}
+ansible-playbook -i hosts 03-etcd.yaml -f ${ansible_forks_num}
+ansible-playbook -i hosts 04-docker.yaml -f ${ansible_forks_num}
+ansible-playbook -i hosts 05-calico.yaml -f ${ansible_forks_num}
+ansible-playbook -i hosts 06-k8s-master.yaml -f ${ansible_forks_num}
+ansible-playbook -i hosts 07-k8s-node.yaml -f ${ansible_forks_num}
+ansible-playbook -i hosts 08-todo.yaml -f ${ansible_forks_num}

@@ -1,17 +1,22 @@
+- name: update yum.repos.d
+  shell: rm -rf /etc/yum.repos.d/* && \
+         wget http://mirrors.163.com/.help/CentOS7-Base-163.repo -O /etc/yum.repos.d/CentOS-Base.repo && \
+         yum clean all && \
+         yum makecache
+
+- name: yum update -y
+  shell: yum update -y
+
 - name: update hostname
   shell: echo {{ SERVER_NAME }} > /etc/hostname
-  tags: init
 
 - name: disable selinux
   shell: echo "SELINUX=disabled" > /etc/selinux/config && \
          echo "SELINUXTYPE=targeted" >> /etc/selinux/config
-  tags: init
-
 
 - name: update kernel
   shell: rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org; \
          rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
-  tags: kernel
   ignore_errors: true
 
 - name: install latest kernel
@@ -19,12 +24,10 @@
   with_items:
   - "kernel-ml-devel"
   - "kernel-ml"
-  tags: kernel
+  ignore_errors: true
 
 - name: grub2-set-default 0 
   shell: grub2-set-default 0
-  tags: kernel
 
 - name: reboot
   shell: reboot
-  tags: init
