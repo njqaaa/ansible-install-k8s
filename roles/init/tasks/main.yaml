@@ -26,6 +26,11 @@
   - "kernel-ml"
   ignore_errors: true
 
+- name: install socat for helm
+  yum: name={{ item }} state=latest
+  with_items:
+  - "socat"
+
 - name: grub2-set-default 0 
   shell: grub2-set-default 0
 
