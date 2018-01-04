@@ -15,7 +15,7 @@
          echo "SELINUXTYPE=targeted" >> /etc/selinux/config
 
 - name: update kernel
-  shell: rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org; \
+  shell: rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org && \
          rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
   ignore_errors: true
 

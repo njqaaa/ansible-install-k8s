@@ -1,5 +1,5 @@
 #!/bin/bash
-export k8s_version="v1.8.5"
+export k8s_version="v1.8.6"
 export ansible_forks_num='6'
 ansible_dir=`pwd`
 k8s_package_path='/tmp/src'
@@ -16,6 +16,7 @@ cp ${k8s_package_path}/k8s_bin/kubelet ${node_bin}
 cp ${k8s_package_path}/k8s_bin/kube-proxy ${node_bin}
 mv ${k8s_package_path}/cfssl/* ${cert_bin}
 mv ${k8s_package_path}/k8s_bin/* ${master_bin}
+mv ${k8s_package_path}/helm/* ${master_bin}
 mv ${k8s_package_path}/cni/* ${calico_bin}
 mv ${k8s_package_path}/etcd_bin/* ${etcd_bin}
 

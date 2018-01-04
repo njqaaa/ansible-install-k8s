@@ -15,6 +15,7 @@
   - "kubectl"
   - "kube-proxy"
   - "kubelet"
+  - "helm"
 
 - name: sync service
   template: src=service/{{ item }} dest={{ service_dir }}{{ item }}
