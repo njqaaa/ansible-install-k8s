@@ -6,6 +6,7 @@
 
 - name: yum update -y
   shell: yum update -y
+  ignore_errors: true
 
 - name: update hostname
   shell: echo {{ SERVER_NAME }} > /etc/hostname

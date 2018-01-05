@@ -47,6 +47,6 @@ kubelet_lib_dir='/var/lib/kubelet/'
 kube_proxy_lib_dir='/var/lib/kube-proxy/'
 service_dir='/lib/systemd/system/'
 
-# BASIC_AUTH_USER 账号密码验证功能，修改basic-auth.csv
+# BASIC_AUTH_USER 账号密码验证功能，需修改basic-auth.csv
 BASIC_AUTH_USER="admin"
 # BASIC_AUTH_PASS admin.p12 密码
