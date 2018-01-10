@@ -50,3 +50,5 @@ service_dir='/lib/systemd/system/'
 # BASIC_AUTH_USER 账号密码验证功能，需修改basic-auth.csv
 BASIC_AUTH_USER="admin"
 # BASIC_AUTH_PASS admin.p12 密码
+BASIC_AUTH_PASS="913131601796132300faa49f0e0eed1e"
+BOOTSTRAP_TOKEN="fb071fe2ae51a1011c9a6770a1dcad29"

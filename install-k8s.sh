@@ -34,7 +34,7 @@ if [[ $? -ne 0 ]];then
     echo BOOTSTRAP_TOKEN=\"${bootstrap_token}\" >> hosts
 fi
 
-ansible-playbook -i hosts 00-init.yaml
+#ansible-playbook -i hosts 00-init.yaml
 echo reboot now
 # 等待重启完成
 until ansible k8s-cluster -i hosts -u root -m shell -a 'w' > /dev/null 2>&1; do sleep 2; printf "."; done

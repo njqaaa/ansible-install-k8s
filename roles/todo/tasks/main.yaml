@@ -59,6 +59,12 @@
   - "tomcat.yaml"
   when: EXEC_MASTER is defined and EXEC_MASTER == "true"
 
+- name: install helm
+  shell: helm init --upgrade -i njqaaa/tiller:v2.7.2 --aliyuncs-repo-url https://kubernetes.oss-cn-hangzhou.aliyuncs.com/charts && \
+         kubectl create serviceaccount --namespace kube-system tiller && \
+         kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller && \
+         kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
+
 - name: create admin.p12
   shell: openssl pkcs12 -export -in {{ ca_dir }}admin.pem -out {{ ca_dir }}admin.p12 -inkey {{ ca_dir }}admin-key.pem -passout pass:{{ BASIC_AUTH_PASS }}
   when: EXEC_MASTER is defined and EXEC_MASTER == "true"
