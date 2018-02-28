@@ -1,0 +1,5 @@
+- hosts: helm
+  user: root
+  roles:
+  - helm
+

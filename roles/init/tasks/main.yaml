@@ -31,9 +31,21 @@
   yum: name={{ item }} state=latest
   with_items:
   - "socat"
+  - "git"
+  ignore_errors: true
 
 - name: grub2-set-default 0 
   shell: grub2-set-default 0
+
+- name: sync journald.conf
+  copy: src=journald.conf dest=/etc/systemd/journald.conf
+
+- name: start service
+  shell: systemctl enable {{ item }} && \
+         systemctl restart {{ item }} && \
+         systemctl status {{ item }}
+  with_items:
+  - "systemd-journald"
 
 - name: reboot
   shell: reboot

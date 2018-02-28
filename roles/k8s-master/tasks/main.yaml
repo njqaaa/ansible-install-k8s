@@ -1,11 +1,6 @@
 - name: sync env
   copy: src=env/master.sh dest=/etc/profile.d/master.sh mode=0755
 
-- name: sync manifests
-  copy: src=manifests/{{ item }} dest={{ k8s_manifests_dir }}{{ item }}
-  with_items:
-  - "node-exporter.yaml"
-
 - name: sync bin
   copy: src=bin/{{ item }} dest={{ bin_dir }}{{ item }} mode=0755
   with_items:
@@ -15,7 +10,6 @@
   - "kubectl"
   - "kube-proxy"
   - "kubelet"
-  - "helm"
 
 - name: sync service
   template: src=service/{{ item }} dest={{ service_dir }}{{ item }}
@@ -23,6 +17,7 @@
   - "kube-apiserver.service"
   - "kube-controller-manager.service"
   - "kube-scheduler.service"
+  - "kube-proxy.service"
   - "kubelet.service"
 
 - name: daemon-reload
@@ -36,5 +31,6 @@
   - "kube-apiserver"
   - "kube-controller-manager"
   - "kube-scheduler"
+  - "kube-proxy"
   - "kubelet"
 

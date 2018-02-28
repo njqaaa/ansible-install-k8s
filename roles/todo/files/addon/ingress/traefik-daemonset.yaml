@@ -1,0 +1,30 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: traefik-ingress-controller
+  namespace: kube-system
+  labels:
+    app: traefik-ingress-lb
+spec:
+  selector:
+    matchLabels:
+      app: traefik-ingress-lb
+  template:
+    metadata:
+      labels:
+        app: traefik-ingress-lb
+        name: traefik-ingress-lb
+    spec:
+      serviceAccountName: traefik-ingress-controller
+      terminationGracePeriodSeconds: 60
+      hostNetwork: true
+      containers:
+      - image: traefik
+        name: traefik-ingress-lb
+        args:
+        - --web
+        - --kubernetes
+        ports:
+        - containerPort: 80
+          hostPort: 80
+          name: web

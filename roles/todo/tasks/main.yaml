@@ -1,33 +1,34 @@
-- name: kubectl create clusterrolebinding kubelet-bootstrap
-  shell: "sleep 60 && {{ bin_dir }}kubectl create clusterrolebinding kubelet-bootstrap \
-        --clusterrole=system:node --user=kubelet-bootstrap"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
-  ignore_errors: true
-
-- name: kubectl certificate approve
-  shell: "sleep 30 && kubectl get csr | grep -v 'NAME' | awk '{print $1}' | xargs kubectl certificate approve"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
-  ignore_errors: true
-
-- name: kubectl taint masters NoSchedule
-  shell: kubectl taint nodes {{ k8s_cluster }} key=value:NoSchedule
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
-  ignore_errors: true
+#- name: kubectl create clusterrolebinding kubelet-bootstrap
+#  shell: "sleep 60 && {{ bin_dir }}kubectl create clusterrolebinding kubelet-bootstrap \
+#        --clusterrole=system:node --user=kubelet-bootstrap"
+#  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+#  ignore_errors: true
+#
+#- name: kubectl certificate approve
+#  shell: "sleep 30 && kubectl get csr | grep -v 'NAME' | awk '{print $1}' | xargs kubectl certificate approve"
+#  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+#  ignore_errors: true
+#
+#- name: kubectl taint masters NoSchedule
+#  shell: kubectl taint nodes {{ k8s_cluster }} key=value:NoSchedule
+#  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+#  ignore_errors: true
+#
+- name: sync files addon
+  synchronize: src=addon/{{ item }} dest={{ k8s_addon_dir }}
+  with_items:
+  - "dashboard"
+  - "monitoring"
+  - "ingress"
+  - "fluentd-elasticsearch"
 
 - name: sync templates addon
   template: src=addon/{{ item }} dest={{ k8s_addon_dir }}{{ item }}
   with_items:
   - "calico-kube-controllers.yaml"
   - "kube-dns.yaml"
-  - "tomcat.yaml"
+  - "fluentd-elasticsearch/kibana-configmap.yaml"
 
-- name: sync files addon
-  synchronize: src=addon/{{ item }} dest={{ k8s_addon_dir }}
-  with_items:
-  - "dashboard"
-  - "monitor"
-#  - "heapster"
-  - "ingress"
 
 - name: kubectl apply -f main
   shell: kubectl apply -f {{ k8s_addon_dir }}{{ item }}
@@ -36,34 +37,20 @@
   - "kube-dns.yaml"
   when: EXEC_MASTER is defined and EXEC_MASTER == "true"
 
-- name: clone prometheus-operator
-  git: repo=https://github.com/coreos/prometheus-operator.git dest={{ k8s_addon_dir }}prometheus-operator
+- name: deploy monitoring
+  shell:  cd {{ k8s_addon_dir }}/monitoring && \
+          ./deploy
   when: EXEC_MASTER is defined and EXEC_MASTER == "true"
   ignore_errors: true
-
-- name: replace gcr.io
-  shell: sed -i 's/gcr.io\/google_containers/njqaaa/g' {{ k8s_addon_dir }}prometheus-operator/contrib/kube-prometheus/manifests/kube-state-metrics/kube-state-metrics-deployment.yaml {{ k8s_addon_dir }}prometheus-operator/contrib/kube-prometheus/manifests/metrics-server/metrics-server-deployment.yaml
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
-
-- name: install prometheus
-  shell: cd {{ k8s_addon_dir }}prometheus-operator/contrib/kube-prometheus && \
-         hack/cluster-monitoring/deploy
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
 
 - name: kubectl apply -f  
   shell: kubectl apply -f {{ k8s_addon_dir }}{{ item }}
   with_items:
   - "dashboard"
-#  - "heapster"
   - "ingress"
-  - "tomcat.yaml"
+  - "fluentd-elasticsearch"
   when: EXEC_MASTER is defined and EXEC_MASTER == "true"
-
-- name: install helm
-  shell: helm init --upgrade -i njqaaa/tiller:v2.7.2 --aliyuncs-repo-url https://kubernetes.oss-cn-hangzhou.aliyuncs.com/charts && \
-         kubectl create serviceaccount --namespace kube-system tiller && \
-         kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller && \
-         kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
+  ignore_errors: true
 
 - name: create admin.p12
   shell: openssl pkcs12 -export -in {{ ca_dir }}admin.pem -out {{ ca_dir }}admin.p12 -inkey {{ ca_dir }}admin-key.pem -passout pass:{{ BASIC_AUTH_PASS }}

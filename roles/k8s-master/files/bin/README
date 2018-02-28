@@ -4,4 +4,3 @@ kube-scheduler
 kubectl
 kube-proxy
 kubelet
-helm

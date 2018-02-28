@@ -8,6 +8,9 @@
 - name: sync hosts
   copy: src=hosts dest=/etc/hosts
 
+- name: sync limits.conf
+  copy: src=limits.conf dest=/etc/security/limits.conf
+
 - name: sync hosts
   copy: src=sysctl.d/k8s.conf dest=/etc/sysctl.d/k8s.conf
 
@@ -31,3 +34,4 @@
   - "{{ calico_log }}"
   - "{{ kubelet_lib_dir }}"
   - "{{ kube_proxy_lib_dir }}"
+  - "/var/log/pos"

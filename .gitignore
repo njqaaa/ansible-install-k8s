@@ -20,3 +20,9 @@ roles/k8s-master/files/bin/*
 
 roles/k8s-node/files/bin/*
 !roles/k8s-node/files/bin/README
+
+roles/es/files/dir/*
+!roles/es/files/dir/README
+
+roles/helm/files/bin/*
+!roles/helm/files/bin/README

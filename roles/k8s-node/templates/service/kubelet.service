@@ -9,10 +9,10 @@ WorkingDirectory={{ kubelet_lib_dir }}
 ExecStart={{ bin_dir }}kubelet \
   --address={{ ansible_default_ipv4.address }} \
   --hostname-override={{ ansible_hostname }} \
-  --pod-infra-container-image=njqaaa/pause:3.0 \
+  --pod-infra-container-image=googlecontainer/pause-amd64:3.0 \
   --pod-manifest-path={{ k8s_manifests_dir }} \
-  --experimental-bootstrap-kubeconfig={{ k8s_dir }}bootstrap.kubeconfig \
-  --kubeconfig={{ k8s_dir }}kubelet.kubeconfig \
+  --bootstrap-kubeconfig={{ k8s_dir }}bootstrap.kubeconfig \
+  --kubeconfig={{ k8s_dir }}bootstrap.kubeconfig \
   --cert-dir={{ ca_dir }} \
   --network-plugin=cni \
   --cni-conf-dir={{ cni_dir }} \
@@ -25,6 +25,10 @@ ExecStart={{ bin_dir }}kubelet \
   --node-labels=node-role.kubernetes.io/node=true \
   --logtostderr=true \
   --v=2
+# \
+#  --log-dir=/var/log/k8s/ \
+#  --logtostderr=false
+
 Restart=on-failure
 RestartSec=5
 

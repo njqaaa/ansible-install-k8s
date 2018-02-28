@@ -2,7 +2,7 @@
   "CN": "kubernetes",
   "hosts": [
     "127.0.0.1",
-    "{{ KUBE_APISERVER_DOMAIN }}",
+    "{{ LB_IP }}",
     "{{ CLUSTER_KUBERNETES_SVC_IP }}",
     "kubernetes",
     "kubernetes.default",

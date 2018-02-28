@@ -16,6 +16,10 @@ ExecStart={{ bin_dir }}kube-controller-manager \
   --root-ca-file={{ ca_dir }}ca.pem \
   --leader-elect=true \
   --v=2
+# \
+#  --log-dir=/var/log/k8s/ \
+#  --logtostderr=false
+
 Restart=on-failure
 RestartSec=5
 

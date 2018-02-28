@@ -1,0 +1,38 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kibana-logging
+  namespace: kube-system
+  labels:
+    app: kibana-logging
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana-logging
+  template:
+    metadata:
+      labels:
+        app: kibana-logging
+    spec:
+      containers:
+      - name: kibana-logging
+        image: njqaaa/kibana:6.2.2
+        resources:
+          limits:
+            cpu: 1000m
+          requests:
+            cpu: 100m
+        ports:
+        - containerPort: 5601
+          name: ui
+          protocol: TCP
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/kibana/config
+      volumes:
+      - name: config-volume
+        configMap:
+          name: kibana-config

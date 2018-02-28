@@ -1,0 +1,1 @@
+kubectl label nodes <node-name> beta.kubernetes.io/fluentd-ds-ready=true
