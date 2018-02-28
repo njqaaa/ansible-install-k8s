@@ -37,11 +37,3 @@ set_version
 rm -rf ${es_dir}*
 mv * ${es_dir}
 
-
-function check_alive() {
-    # check ssh是否正常
-    echo check server and waiting...
-    until ansible es -u root -m shell -a 'w' > /dev/null 2>&1; do sleep 2; printf "."; done
-}
-
-check_alive

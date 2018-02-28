@@ -38,22 +38,25 @@ if [[ $? -ne 0 ]];then
     echo BOOTSTRAP_TOKEN=\"${bootstrap_token}\" >> hosts
 fi
 function check_alive() {
+    group_name=$1
     # check ssh是否正常
     echo check server and waiting...
-    until ansible k8s-cluster -u root -m shell -a 'w' > /dev/null 2>&1; do sleep 2; printf "."; done
+    echo  ${group_name}
+    until ansible ${group_name} -u root -m shell -a 'w' > /dev/null 2>&1; do sleep 2; printf "."; done
 }
-check_alive
-#ansible-playbook 00-init.yaml
-#echo reboot now
-#check_alive
-#
-#ansible-playbook 01-common.yaml
-#ansible-playbook 02-cert.yaml
-#ansible-playbook 03-etcd.yaml
-#ansible-playbook 04-docker.yaml
-#ansible-playbook 05-calico.yaml
-#ansible-playbook 06-k8s-master.yaml
-#ansible-playbook 07-k8s-node.yaml
+check_alive k8s-cluster
+ansible-playbook 00-init.yaml
+check_alive k8s-cluster
+
+ansible-playbook 01-common.yaml
+ansible-playbook 02-cert.yaml
+ansible-playbook 03-etcd.yaml
+ansible-playbook 04-docker.yaml
+ansible-playbook 05-calico.yaml
+ansible-playbook 06-k8s-master.yaml
+ansible-playbook 07-k8s-node.yaml
+
 bash install-es.sh
+check_alive es
 ansible-playbook 08-es.yaml
 ansible-playbook 09-todo.yaml
