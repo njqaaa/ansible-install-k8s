@@ -1,0 +1,25 @@
+- name: initialize dir
+  file: name={{ item }} state=directory mode=0755
+  with_items:
+  - "{{ k8s_addon_dir }}"
+  - "/root/.kubeconfig"
+
+- name: sync bin
+  copy: src=bin/{{ item }} dest={{ bin_dir }}{{ item }} mode=0755
+  with_items:
+  - "helm"
+
+- name: sync rbac-config.yaml
+  synchronize: src=addon/{{ item }} dest={{ k8s_addon_dir }}
+  with_items:
+  - "rbac-config.yaml"
+
+- name: kubectl apply -f rbac-config.yaml
+  shell: kubectl apply -f {{ k8s_addon_dir }}{{ item }}
+  with_items:
+  - "rbac-config.yaml"
+
+- name: install helm
+  shell:  helm init --upgrade -i njqaaa/tiller:v2.7.2 --stable-repo-url https://kubernetes.oss-cn-hangzhou.aliyuncs.com/charts && \
+         kubectl patch deployment -n kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
+

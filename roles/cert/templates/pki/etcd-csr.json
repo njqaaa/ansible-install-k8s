@@ -1,0 +1,26 @@
+{
+  "CN": "etcd",
+  "hosts": [
+    "127.0.0.1",
+    "k8s-master-1",
+    "k8s-master-2",
+    "k8s-master-3",
+    "k8s-etcd-1",
+    "k8s-etcd-2",
+    "k8s-etcd-3",
+    "{{ CLUSTER_KUBERNETES_SVC_IP }}"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "CN",
+      "ST": "ShangHai",
+      "L": "XS",
+      "O": "k8s",
+      "OU": "System"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+[monitoring](https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus)
+[fluentd-elasticsearch](https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/fluentd-elasticsearch)
+dashboard
+ingress

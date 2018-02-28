@@ -1,0 +1,51 @@
+- name: update yum.repos.d
+  shell: rm -rf /etc/yum.repos.d/* && \
+         wget http://mirrors.163.com/.help/CentOS7-Base-163.repo -O /etc/yum.repos.d/CentOS-Base.repo && \
+         yum clean all && \
+         yum makecache
+
+- name: yum update -y
+  shell: yum update -y
+  ignore_errors: true
+
+- name: update hostname
+  shell: echo {{ SERVER_NAME }} > /etc/hostname
+
+- name: disable selinux
+  shell: echo "SELINUX=disabled" > /etc/selinux/config && \
+         echo "SELINUXTYPE=targeted" >> /etc/selinux/config
+
+- name: update kernel
+  shell: rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org && \
+         rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
+  ignore_errors: true
+
+- name: install latest kernel
+  yum: name={{ item }} enablerepo=elrepo-kernel state=latest
+  with_items:
+  - "kernel-ml-devel"
+  - "kernel-ml"
+  ignore_errors: true
+
+- name: install socat for helm
+  yum: name={{ item }} state=latest
+  with_items:
+  - "socat"
+  - "git"
+  ignore_errors: true
+
+- name: grub2-set-default 0 
+  shell: grub2-set-default 0
+
+- name: sync journald.conf
+  copy: src=journald.conf dest=/etc/systemd/journald.conf
+
+- name: start service
+  shell: systemctl enable {{ item }} && \
+         systemctl restart {{ item }} && \
+         systemctl status {{ item }}
+  with_items:
+  - "systemd-journald"
+
+- name: reboot
+  shell: reboot

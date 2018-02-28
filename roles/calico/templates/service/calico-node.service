@@ -1,0 +1,40 @@
+[Unit]
+Description=calico node
+After=docker.service
+Requires=docker.service
+
+[Service]
+User=root
+PermissionsStartOnly=true
+ExecStart=/usr/bin/docker run --net=host --privileged --name=calico-node \
+  -e ETCD_ENDPOINTS={{ ETCD_ENDPOINTS }} \
+  -e ETCD_CA_CERT_FILE={{ ca_dir }}ca.pem \
+  -e ETCD_CERT_FILE={{ etcd_ca_dir }}etcd.pem \
+  -e ETCD_KEY_FILE={{ etcd_ca_dir }}etcd-key.pem \
+  -e NODENAME={{ansible_hostname}} \
+  -e IP= \
+  -e NO_DEFAULT_POOLS= \
+  -e AS= \
+  -e CALICO_LIBNETWORK_ENABLED=true \
+  -e IP6= \
+  -e CALICO_NETWORKING_BACKEND=bird \
+  -e FELIX_DEFAULTENDPOINTTOHOSTACTION=ACCEPT \
+  -e FELIX_HEALTHENABLED=true \
+  -e CALICO_IPV4POOL_CIDR={{ CLUSTER_CIDR }} \
+  -e CALICO_IPV4POOL_IPIP=always \
+  -e IP_AUTODETECTION_METHOD=interface={{ IP_METHOD }} \
+  -e IP6_AUTODETECTION_METHOD=interface={{ IP_METHOD }} \
+  -v {{ ca_dir }}:{{ ca_dir }} \
+  -v {{ etcd_ca_dir }}:{{ etcd_ca_dir }} \
+  -v /var/run/calico:/var/run/calico \
+  -v /lib/modules:/lib/modules \
+  -v /run/docker/plugins:/run/docker/plugins \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v {{ calico_log }}:{{ calico_log}} \
+  quay.io/calico/node:v2.6.3
+ExecStop=/usr/bin/docker rm -f calico-node
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,23 @@
+- name: sync bin
+  copy: src=bin/{{ item }} dest={{ bin_dir }}{{ item }} mode=0755
+  with_items:
+  - kubelet
+  - kube-proxy
+
+- name: sync service 
+  template: src=service/{{ item }} dest={{ service_dir }}{{ item }}
+  with_items:
+  - "kubelet.service"
+  - "kube-proxy.service"
+
+- name: systemctl daemon-reload
+  shell: systemctl daemon-reload
+
+- name: start service
+  shell: systemctl enable {{ item }} && \
+         systemctl restart {{ item }} && \
+         systemctl status {{ item }}
+  with_items:
+  - "kubelet.service"
+  - "kube-proxy.service"
+  

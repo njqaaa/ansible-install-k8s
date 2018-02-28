@@ -1,0 +1,5 @@
+- hosts: k8s-node
+  user: root
+  roles:
+  - k8s-node
+

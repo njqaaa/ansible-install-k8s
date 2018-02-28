@@ -1,0 +1,33 @@
+- name: git clone harbor
+  git: repo=https://github.com/njqaaa/harbor.git
+       dest={{ k8s_addon_dir }}/harbor
+  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  ignore_errors: true
+
+- name : kubectl create namespace harbor
+  shell: kubectl create namespace harbor
+  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  ignore_errors: true
+
+- name: sync harbor.cfg
+  template: src={{ item }} dest={{ k8s_addon_dir }}harbor/make/{{ item }}
+  with_items:
+  - "harbor.cfg"
+  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+
+- name: python k8s-prepare
+  shell: cd  {{ k8s_addon_dir }}harbor/make/kubernetes/ && \
+         python k8s-prepare
+  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+
+- name: kubectl -n harbor apply -f 
+  shell: kubectl -n harbor apply -f {{ k8s_addon_dir }}{{ item }}
+  with_items:
+  - "harbor/make/kubernetes/adminserver"
+  - "harbor/make/kubernetes/jobservice"
+  - "harbor/make/kubernetes/mysql"
+  - "harbor/make/kubernetes/pv"
+  - "harbor/make/kubernetes/registry"
+  - "harbor/make/kubernetes/ui"
+  - "harbor/make/kubernetes/nginx"
+  when: EXEC_MASTER is defined and EXEC_MASTER == "true"

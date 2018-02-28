@@ -1,0 +1,37 @@
+- name: sync env
+  copy: src=env/master.sh dest=/etc/profile.d/master.sh mode=0755
+
+- name: sync bin
+  copy: src=bin/{{ item }} dest={{ bin_dir }}{{ item }} mode=0755
+  with_items:
+  - "kube-apiserver"
+  - "kube-controller-manager"
+  - "kube-scheduler"
+  - "kubectl"
+  - "kube-proxy"
+  - "kubelet"
+  - "helm"
+
+- name: sync service
+  template: src=service/{{ item }} dest={{ service_dir }}{{ item }}
+  with_items:
+  - "kube-apiserver.service"
+  - "kube-controller-manager.service"
+  - "kube-scheduler.service"
+  - "kube-proxy.service"
+  - "kubelet.service"
+
+- name: daemon-reload
+  shell: systemctl daemon-reload
+
+- name: start service
+  shell: systemctl enable {{ item }} && \
+         systemctl restart {{ item }} && \
+         systemctl status {{ item }}
+  with_items:
+  - "kube-apiserver"
+  - "kube-controller-manager"
+  - "kube-scheduler"
+  - "kube-proxy"
+  - "kubelet"
+

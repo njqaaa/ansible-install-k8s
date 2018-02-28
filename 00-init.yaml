@@ -1,0 +1,5 @@
+- hosts: k8s-cluster
+  user: root
+  roles:
+  - init
+

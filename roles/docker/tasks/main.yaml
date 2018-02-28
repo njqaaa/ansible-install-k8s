@@ -1,0 +1,14 @@
+- name: curl -fsSL "https://get.docker.com/" | sh
+  shell: curl -fsSL "https://get.docker.com/" | sh
+
+- name: sync service
+  template: src=service/docker.service dest=/usr/lib/systemd/system/docker.service
+
+- name: daocloud
+  shell: curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://61838238.m.daocloud.io
+
+- name: systemctl docker.service
+  shell: systemctl daemon-reload && \
+         systemctl enable docker.service && \
+         systemctl restart docker.service && \
+         systemctl status docker.service

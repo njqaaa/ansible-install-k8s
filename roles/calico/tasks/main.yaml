@@ -1,0 +1,21 @@
+- name: sync bin
+  copy: src=bin/{{ item }} dest={{ bin_dir }} mode=0755
+  with_items:
+  - "calico"
+  - "calico-ipam"
+  - "loopback"
+  - "calicoctl"
+
+- name: sync calico-node.service
+  template: src=service/{{ item }} dest={{ service_dir }}{{ item }}
+  with_items:
+  - "calico-node.service"
+
+- name: sync 10-calico.conf
+  template: src=net.d/10-calico.conf dest={{ cni_dir }}10-calico.conf
+
+- name: systemctl calico-node.service
+  shell: systemctl daemon-reload && \
+         systemctl enable calico-node.service && \
+         systemctl restart calico-node.service && \
+         systemctl status calico-node.service

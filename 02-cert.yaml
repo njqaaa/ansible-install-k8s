@@ -1,0 +1,65 @@
+- hosts: 'k8s-master'
+  user: root
+  roles:
+  - cert
+
+- hosts: 'k8s-master'
+  remote_user: root
+  tasks:
+  - name: sync cert to {{ ca_dir }}
+    copy: src=roles/cert/files/certs/{{ item }} dest={{ ca_dir }}{{ item }}
+    with_items:
+    - "admin-key.pem"
+    - "admin.pem"
+    - "ca-key.pem"
+    - "ca.pem"
+    - "kubernetes-key.pem"
+    - "kubernetes.pem"
+    - "basic-auth.csv"
+    - "token.csv"
+
+  - name: sync cert to {{ etcd_ca_dir }}
+    copy: src=roles/cert/files/certs/{{ item }} dest={{ etcd_ca_dir }}{{ item }}
+    with_items:
+    - "etcd-key.pem"
+    - "etcd.pem"
+
+  - name: sync tls
+    copy: src=roles/cert/files/tls/{{ item }} dest={{ k8s_dir }}{{ item }}
+    with_items:
+    - "bootstrap.kubeconfig"
+    - "kube-proxy.kubeconfig"
+
+- hosts: 'k8s-node'
+  remote_user: root
+  tasks:
+  - name: sync cert to {{ ca_dir }}
+    copy: src=roles/cert/files/certs/{{ item }} dest={{ ca_dir }}{{ item }}
+    with_items:
+    - "ca.pem"
+
+  - name: sync cert to {{ etcd_ca_dir }}
+    copy: src=roles/cert/files/certs/{{ item }} dest={{ etcd_ca_dir }}{{ item }}
+    with_items:
+    - "etcd-key.pem"
+    - "etcd.pem"
+
+  - name: sync tls
+    copy: src=roles/cert/files/tls/{{ item }} dest={{ k8s_dir }}{{ item }}
+    with_items:
+    - "bootstrap.kubeconfig"
+    - "kube-proxy.kubeconfig"
+
+- hosts: 'k8s-etcd'
+  remote_user: root
+  tasks:
+  - name: sync cert to {{ ca_dir }}
+    copy: src=roles/cert/files/certs/{{ item }} dest={{ ca_dir }}{{ item }}
+    with_items:
+    - "ca.pem"
+
+  - name: sync cert to {{ etcd_ca_dir }}
+    copy: src=roles/cert/files/certs/{{ item }} dest={{ etcd_ca_dir }}{{ item }}
+    with_items:
+    - "etcd-key.pem"
+    - "etcd.pem"
