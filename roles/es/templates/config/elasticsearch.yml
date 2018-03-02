@@ -1,5 +1,5 @@
 # 集群名
-cluster.name: fruitday-es-test
+cluster.name: {{ es_cluster_name }}
 
 # 节点名
 node.name: {{ ansible_hostname }}

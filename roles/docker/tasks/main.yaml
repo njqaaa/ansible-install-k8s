@@ -4,8 +4,8 @@
 - name: sync service
   template: src=service/docker.service dest=/usr/lib/systemd/system/docker.service
 
-- name: daocloud
-  shell: curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://61838238.m.daocloud.io
+- name: daocloud and private repo
+  template: src=templates/daemon.json dest=/etc/docker/daemon.json
 
 - name: systemctl docker.service
   shell: systemctl daemon-reload && \

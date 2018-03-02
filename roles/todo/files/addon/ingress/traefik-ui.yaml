@@ -6,7 +6,7 @@ metadata:
   namespace: kube-system
 spec:
   rules:
-  - host: traefik-ui.test.fruitday.com
+  - host: k8s-traefik-ui.test.fruitday.com
     http:
       paths:
       - path: /

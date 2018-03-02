@@ -36,4 +36,9 @@ set_version
 
 rm -rf ${es_dir}*
 mv * ${es_dir}
+cd ${es_dir}
 
+git clone https://github.com/mobz/elasticsearch-head
+rm -rf elasticsearch-head/.git
+git clone https://github.com/hlstudio/bigdesk
+rm -rf bigdesk/.git

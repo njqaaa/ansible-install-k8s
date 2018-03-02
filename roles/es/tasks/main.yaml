@@ -16,13 +16,15 @@
   with_items:
   - "jdk.sh"
 
-- name: add user es
-  user: name=es shell=/bin/bash append=yes
+- name: add {{ es_user }}
+  user: name={{ es_user }} shell=/bin/bash append=yes
 
 - name: sync es
   synchronize: src=dir/{{ item }} dest=/opt
   with_items:
   - "elasticsearch"
+  - "elasticsearch-head"
+  - "bigdesk"
 
 - name:  sync config
   template: src=config/{{ item }} dest={{ es_dir }}config/{{ item }}
@@ -44,31 +46,8 @@
 - name: sysctl -p /etc/sysctl.d/es.conf
   shell: sysctl -p /etc/sysctl.d/es.conf
 
-# python -m SimpleHTTPServer
-- name: git clone elasticsearch-head
-  git: repo=https://github.com/mobz/elasticsearch-head
-       dest={{ es_head_dir }}
-  ignore_errors: true
-
-- name: git clone bigdesk
-  git: repo=https://github.com/hlstudio/bigdesk
-       dest={{ es_bigdesk_dir }}
-  ignore_errors: true
-
-- name: install nodejs
-  yum: name={{ item }} state=latest
-  with_items:
-  - "nodejs"
-  ignore_errors: true
-
-- name: npm install grunt
-  shell: npm install -g {{ item }} --registry=https://registry.npm.taobao.org
-  with_items:
-  - "grunt"
-  ignore_errors: true
-
-- name: directory owner for es
-  file: name={{ item }} state=directory mode=0755 owner=es group=es recurse=yes
+- name: directory owner for {{ es_user }}
+  file: name={{ item }} state=directory mode=0755 owner={{ es_user }} group={{ es_user }} recurse=yes
   with_items:
   - "{{ es_dir }}"
   - "{{ es_head_dir }}"

@@ -5,7 +5,7 @@ metadata:
   namespace: monitoring
 spec:
   rules:
-  - host: prometheus.test.fruitday.com
+  - host: k8s-prometheus.test.fruitday.com
     http:
       paths:
       - path: /

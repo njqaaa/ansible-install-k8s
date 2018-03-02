@@ -1,0 +1,217 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: fluentd-es-config-v1
+  namespace: kube-system
+  labels:
+    addonmanager.kubernetes.io/mode: Reconcile
+data:
+  system.conf: |-
+    <system>
+      root_dir /tmp/fluentd-buffers/
+    </system>
+
+  containers.input.conf: |-
+    <source>
+      @id k8s-containers.log
+      @type tail
+      @label @k8s-containers
+      path /var/log/containers/*
+      exclude_path ["/var/log/containers/kibana-logging-*"]
+      pos_file /var/log/pos/k8s-containers.log.pos
+      time_format %Y-%m-%dT%H:%M:%S.%NZ
+      tag raw.kubernetes.*
+      format json
+      read_from_head true
+    </source>
+
+  system.input.conf: |-
+    <source>
+      @type systemd
+      @label @journal
+      tag kube-apiserver
+      path /var/log/journal
+      filters [{ "_SYSTEMD_UNIT": "kube-apiserver.service" }]
+      read_from_head true
+      <storage>
+        @type local
+        persistent false
+        path /var/log/pos/kube-apiserver.pos
+      </storage>
+    </source>
+
+    <source>
+      @type systemd
+      @label @journal
+      tag kube-controller-manager
+      path /var/log/journal
+      filters [{ "_SYSTEMD_UNIT": "kube-controller-manager.service" }]
+      read_from_head true
+      <storage>
+        @type local
+        persistent false
+        path /var/log/pos/kube-controller-manager.pos
+      </storage>
+    </source>
+
+    <source>
+      @type systemd
+      @label @journal
+      tag kube-scheduler
+      path /var/log/journal
+      filters [{ "_SYSTEMD_UNIT": "kube-scheduler.service" }]
+      read_from_head true
+      <storage>
+        @type local
+        persistent false
+        path /var/log/pos/kube-scheduler.pos
+      </storage>
+    </source>
+
+    <source>
+      @type systemd
+      @label @journal
+      tag kube-proxy
+      path /var/log/journal
+      filters [{ "_SYSTEMD_UNIT": "kube-proxy.service" }]
+      read_from_head true
+      <storage>
+        @type local
+        persistent false
+        path /var/log/pos/kube-proxy.pos
+      </storage>
+    </source>
+
+    <source>
+      @type systemd
+      @label @journal
+      tag kubelet
+      path /var/log/journal
+      filters [{ "_SYSTEMD_UNIT": "kubelet.service" }]
+      read_from_head true
+      <storage>
+        @type local
+        persistent false
+        path /var/log/pos/kubelet.pos
+      </storage>
+    </source>
+
+    <source>
+      @type systemd
+      @label @journal
+      tag etcd
+      path /var/log/journal
+      filters [{ "_SYSTEMD_UNIT": "etcd.service" }]
+      read_from_head true
+      <storage>
+        @type local
+        persistent false
+        path /var/log/pos/etcd.pos
+      </storage>
+    </source>
+
+    <source>
+      @type systemd
+      @label @journal
+      tag calico-node
+      path /var/log/journal
+      filters [{ "_SYSTEMD_UNIT": "calico-node.service" }]
+      read_from_head true
+      <storage>
+        @type local
+        persistent false
+        path /var/log/pos/calico-node.pos
+      </storage>
+    </source>
+
+    <source>
+      @type systemd
+      @label @journal
+      tag docker
+      path /var/log/journal
+      filters [{ "_SYSTEMD_UNIT": "docker.service" }]
+      read_from_head true
+      <storage>
+        @type local
+        persistent false
+        path /var/log/pos/docker.pos
+      </storage>
+    </source>
+    <source>
+      @type systemd
+      @label @journal
+      tag sshd
+      path /var/log/journal
+      filters [{ "_SYSTEMD_UNIT": "sshd.service" }]
+      read_from_head true
+      <storage>
+        @type local
+        persistent false
+        path /var/log/pos/sshd.pos
+      </storage>
+    </source>
+
+  output.conf: |-
+    <label @journal>
+      <filter **>
+        @type systemd_entry
+        field_map {"MESSAGE": "log", "_PID": "pid", "_CMDLINE": "process", "_COMM": "cmd", "_HOSTNAME": "hostname", "_SYSTEMD_UNIT": "system_util"}
+        fields_strip_underscores true
+        field_map_strict true
+        fields_lowercase true
+      </filter>
+
+      <match **>
+        @id journal-elasticsearch
+        @type elasticsearch
+        @log_level info
+        include_tag_key true
+        host {{ LB_IP }}
+        port 9200
+        logstash_format true
+        logstash_prefix journal
+        <buffer>
+          @type file
+          path /var/log/fluentd-buffers/journal.system.buffer
+          flush_mode interval
+          retry_type exponential_backoff
+          flush_thread_count 2
+          flush_interval 5s
+          retry_forever
+          retry_max_interval 30
+          chunk_limit_size 2M
+          queue_limit_length 8
+          overflow_action block
+        </buffer>
+      </match>
+    </label>
+
+    <label @k8s-containers>
+      <filter raw.kubernetes.**>
+        @type kubernetes_metadata
+      </filter>
+      <match **>
+        @id k8s-containers-elasticsearch
+        @type elasticsearch_dynamic
+        @log_level info
+        include_tag_key true
+        host {{ LB_IP }}
+        port 9200
+        logstash_format true
+        logstash_prefix k8s-${record['kubernetes']['namespace_name']}
+        <buffer>
+          @type file
+          path /var/log/fluentd-buffers/k8s-containers.system.buffer
+          flush_mode interval
+          retry_type exponential_backoff
+          flush_thread_count 2
+          flush_interval 5s
+          retry_forever
+          retry_max_interval 30
+          chunk_limit_size 2M
+          queue_limit_length 8
+          overflow_action block
+        </buffer>
+      </match>
+    </label>
+

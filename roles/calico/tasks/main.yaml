@@ -3,8 +3,8 @@
   with_items:
   - "calico"
   - "calico-ipam"
-  - "loopback"
   - "calicoctl"
+  - "loopback"
 
 - name: sync calico-node.service
   template: src=service/{{ item }} dest={{ service_dir }}{{ item }}

@@ -1,0 +1,1 @@
+{"registry-mirrors": ["{{ DAOCLOUD }}"],"insecure-registries": ["{{ HARBOR_DOMAIN }}"] }

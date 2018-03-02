@@ -1,19 +1,19 @@
-#- name: kubectl create clusterrolebinding kubelet-bootstrap
-#  shell: "sleep 60 && {{ bin_dir }}kubectl create clusterrolebinding kubelet-bootstrap \
-#        --clusterrole=system:node --user=kubelet-bootstrap"
-#  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
-#  ignore_errors: true
-#
-#- name: kubectl certificate approve
-#  shell: "sleep 30 && kubectl get csr | grep -v 'NAME' | awk '{print $1}' | xargs kubectl certificate approve"
-#  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
-#  ignore_errors: true
-#
-#- name: kubectl taint masters NoSchedule
-#  shell: kubectl taint nodes {{ k8s_cluster }} key=value:NoSchedule
-#  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
-#  ignore_errors: true
-#
+- name: kubectl create clusterrolebinding kubelet-bootstrap
+  shell: "sleep 60 && {{ bin_dir }}kubectl create clusterrolebinding kubelet-bootstrap \
+        --clusterrole=system:node --user=kubelet-bootstrap"
+  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  ignore_errors: true
+
+- name: kubectl certificate approve
+  shell: "sleep 30 && kubectl get csr | grep -v 'NAME' | awk '{print $1}' | xargs kubectl certificate approve"
+  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  ignore_errors: true
+
+- name: kubectl taint masters NoSchedule
+  shell: kubectl taint nodes {{ k8s_cluster }} key=value:NoSchedule
+  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  ignore_errors: true
+
 - name: sync files addon
   synchronize: src=addon/{{ item }} dest={{ k8s_addon_dir }}
   with_items:
@@ -28,7 +28,7 @@
   - "calico-kube-controllers.yaml"
   - "kube-dns.yaml"
   - "fluentd-elasticsearch/kibana-configmap.yaml"
-
+  - "fluentd-elasticsearch/fluentd-es-configmap.yaml"
 
 - name: kubectl apply -f main
   shell: kubectl apply -f {{ k8s_addon_dir }}{{ item }}

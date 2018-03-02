@@ -5,7 +5,7 @@ metadata:
   namespace: monitoring
 spec:
   rules:
-  - host: prometheus-grafana.test.fruitday.com
+  - host: k8s-grafana.test.fruitday.com
     http:
       paths:
       - path: /
