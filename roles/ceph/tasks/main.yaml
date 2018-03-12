@@ -1,0 +1,58 @@
+- name: initialize dir
+  file: name={{ item }} state=directory mode=0755
+  with_items:
+  - "{{ ceph_dir }}"
+
+- name: initialize dir
+  file: name={{ item }} state=directory mode=0755
+  with_items:
+  - "{{ ceph_dir }}"
+  - "{{ ceph_osd_dir }}"
+  when: OSD is defined and OSD == "true"
+
+- name: add {{ ceph_user }}
+  user: name={{ ceph_user }} shell=/bin/bash append=yes
+
+- name: sync sudoers for {{ ceph_user }}
+  template: src=sudoers.d/sudo-user dest=/etc/sudoers.d/{{ ceph_user }} mode=0440
+
+- name: sync .ssh for {{ ceph_user }}
+  synchronize: src=ssh/.ssh dest=/home/{{ ceph_user }}/
+
+- name: directory owner for {{ ceph_user }}
+  file: name={{ item }} state=directory owner={{ ceph_user }} group={{ ceph_user }} recurse=yes
+  with_items:
+  - "/home/{{ ceph_user }}/.ssh"
+  - "{{ ceph_dir }}"
+  - "{{ ceph_osd_dir }}"
+  ignore_errors: true
+
+- name: yum something
+  shell: yum install -y yum-utils \
+         && yum-config-manager --add-repo https://dl.fedoraproject.org/pub/epel/7/x86_64/ \
+         && yum install --nogpgcheck -y epel-release \
+         && rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+
+- name: StrictHostKeyChecking from ask to no
+  shell: sed -i 's/#   StrictHostKeyChecking ask/StrictHostKeyChecking no/g' /etc/ssh/ssh_config \
+         && systemctl reload sshd
+  when: EXEC is defined and EXEC == "true"
+
+- name: sync ceph.repo
+  copy: src=yum.repos.d/ceph.repo dest=/etc/yum.repos.d/
+  when: EXEC is defined and EXEC == "true"
+
+- name: check ceph-deploy exist
+  shell: /usr/bin/ceph-deploy
+  register: result
+  when: EXEC is defined and EXEC == "true"
+  ignore_errors: True
+
+- name: install ceph-deploy
+  shell: yum update -y \
+         && yum install -y ceph-deploy 
+  when: EXEC is defined and EXEC == "true" and result|failed
+
+- name: ceph-deploy install ceph-manager ceph-mon-1 ceph-osd-1 ceph-osd-2
+  shell: ceph-deploy install ceph-manager ceph-mon-1 ceph-osd-1 ceph-osd-2
+  when: EXEC is defined and EXEC == "true"

@@ -1,0 +1,4 @@
+- hosts: ceph-cluster
+  user: root
+  roles:
+  - ceph

@@ -1,13 +1,12 @@
 # k8s-master与etcd公用3台服务器
 [k8s-master]
-10.28.50.61 SERVER_NAME=k8s-master-1 EXEC_MASTER=true # 生产密钥的master
-10.28.50.62 SERVER_NAME=k8s-master-2
-10.28.50.63 SERVER_NAME=k8s-master-3
+10.28.201.61 SERVER_NAME=k8s-master-1 EXEC=true # 执行命令的master
+10.28.201.62 SERVER_NAME=k8s-master-2
+10.28.201.63 SERVER_NAME=k8s-master-3
 
 [k8s-node]
-10.28.50.71 SERVER_NAME=k8s-node-1
-10.28.50.72 SERVER_NAME=k8s-node-2
-10.28.50.73 SERVER_NAME=k8s-node-3
+10.28.201.11 SERVER_NAME=k8s-node-1
+10.28.201.12 SERVER_NAME=k8s-node-2
 
 [k8s-etcd:children]
 k8s-master
@@ -17,13 +16,28 @@ k8s-master
 k8s-node
 k8s-etcd
 
+# elasticsearch
 [es]
-192.168.80.159
-192.168.80.80
-192.168.90.90
-#10.28.50.91
-#10.28.50.92
-#10.28.50.93
+10.28.201.51 SERVER_NAME=es-1
+10.28.201.52 SERVER_NAME=es-2
+10.28.201.53 SERVER_NAME=es-3
+
+[ceph-manager]
+10.28.201.71 SERVER_NAME=ceph-manager EXEC=true
+
+[ceph-mon]
+10.28.201.72 SERVER_NAME=ceph-mon-1
+
+[ceph-osd]
+10.28.201.75 SERVER_NAME=ceph-osd-1 OSD=true
+10.28.201.76 SERVER_NAME=ceph-osd-2 OSD=true
+
+[ceph-cluster:children]
+ceph-manager
+ceph-mon
+ceph-osd
+
+
 
 [all:vars]
 k8s_cluster='k8s-master-1 k8s-master-2 k8s-master-3'
@@ -58,16 +72,23 @@ kube_proxy_lib_dir='/var/lib/kube-proxy/'
 service_dir='/lib/systemd/system/'
 java_dir='/usr/local/java/'
 
-# es相关
+# elasticsearch
 es_user='es'
 es_cluster_name='fruitday-es'
 es_dir='/opt/elasticsearch/'
 es_head_dir='/opt/elasticsearch-head/'
-es_bigdesk_dir='/opt/bigdest/'
+es_bigdesk_dir='/opt/bigdesk/'
+
+#ceph
+ceph_user='ceph'
+ceph_dir='/etc/ceph/'
+ceph_osd_dir='/data/osd/'
+
+# docker
+DAOCLOUD="http://61838238.m.daocloud.io"
+docker_dir='/etc/docker/'
 
 # harbor
-# docker镜像加速
-DAOCLOUD="http://61838238.m.daocloud.io"
 HARBOR_DOMAIN="k8s-harbor.test.fruitday.com"
 HARBOR_DB_PASSWORD="fruitday@888"
 HARBOR_ADMIN_PASSWORD="Harbor12345"

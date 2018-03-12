@@ -1,5 +1,4 @@
-- hosts: k8s-cluster
+- hosts: k8s-cluster:es:ceph-cluster
   user: root
   roles:
   - init
-

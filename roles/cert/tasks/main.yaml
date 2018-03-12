@@ -5,7 +5,7 @@
   - "cfssljson"
   - "cfssl-certinfo"
   - "kubectl"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: sync k8s pki
   template: src=pki/{{ item }} dest={{ ca_dir }}{{ item }}
@@ -15,17 +15,17 @@
   - "ca-csr.json"
   - "kube-proxy-csr.json"
   - "kubernetes-csr.json"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: sync etcd pki
   template: src=pki/{{ item }} dest={{ etcd_ca_dir }}{{ item }}
   with_items:
   - "etcd-csr.json"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: create ca ca pem
   shell: "cd {{ ca_dir }} && {{ bin_dir }}cfssl gencert -initca ca-csr.json | {{ bin_dir }}cfssljson -bare ca"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: create kubernetes pem
   shell: "cd {{ ca_dir }} && {{ bin_dir }}cfssl gencert \
@@ -33,7 +33,7 @@
         -ca-key={{ ca_dir }}ca-key.pem \
         -config={{ ca_dir }}ca-config.json \
         -profile=kubernetes kubernetes-csr.json | {{ bin_dir }}cfssljson -bare kubernetes"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: create kube-proxy pem
   shell: "cd {{ ca_dir }} && {{ bin_dir }}cfssl gencert \
@@ -41,7 +41,7 @@
         -ca-key={{ ca_dir }}ca-key.pem \
         -config={{ ca_dir }}ca-config.json \
         -profile=kubernetes kube-proxy-csr.json | {{ bin_dir }}cfssljson -bare kube-proxy"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: create admin pem
   shell: "cd {{ ca_dir }} && {{ bin_dir }}cfssl gencert \
@@ -49,7 +49,7 @@
         -ca-key={{ ca_dir }}ca-key.pem \
         -config={{ ca_dir }}ca-config.json \
         -profile=kubernetes admin-csr.json | {{ bin_dir }}cfssljson -bare admin"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: create etcd pem
   shell: "cd {{ etcd_ca_dir }} && {{ bin_dir }}cfssl gencert \
@@ -57,15 +57,15 @@
         -ca-key={{ ca_dir }}ca-key.pem \
         -config={{ ca_dir }}ca-config.json \
         -profile=kubernetes etcd-csr.json | {{ bin_dir }}cfssljson -bare etcd"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: create token.csv
   shell: echo {{ BOOTSTRAP_TOKEN }},kubelet-bootstrap,10001,"system:kubelet-bootstrap" > {{ ca_dir }}token.csv
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: sync basic-auth.csv
   template: src=basic-auth.csv dest={{ ca_dir }}basic-auth.csv
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: pull {{ ca_dir }} pem
   synchronize: mode=pull src={{ ca_dir }}{{ item }} dest=roles/cert/files/certs/{{ item }}
@@ -80,14 +80,14 @@
   - "admin.pem"
   - "token.csv"
   - "basic-auth.csv"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: pull {{ etcd_ca_dir }} pem
   synchronize: mode=pull src={{ etcd_ca_dir }}{{ item }} dest=roles/cert/files/certs/{{ item }}
   with_items:
   - "etcd-key.pem"
   - "etcd.pem"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: kube-proxy set-cluster
   shell: "{{ bin_dir }}kubectl config set-cluster kubernetes \
@@ -95,7 +95,7 @@
         --embed-certs=true \
         --server={{ KUBE_APISERVER }} \
         --kubeconfig={{ k8s_dir }}kube-proxy.kubeconfig"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: kube-proxy set-credentials
   shell: "{{ bin_dir }}kubectl config set-credentials kube-proxy \
@@ -103,18 +103,18 @@
     --client-key={{ ca_dir }}kube-proxy-key.pem \
         --embed-certs=true \
         --kubeconfig={{ k8s_dir }}kube-proxy.kubeconfig"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: kube-proxy set-context
   shell: "{{ bin_dir }}kubectl config set-context default \
         --cluster=kubernetes \
         --user=kube-proxy \
         --kubeconfig={{ k8s_dir }}kube-proxy.kubeconfig"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: kube-proxy set default context
   shell: "{{ bin_dir }}kubectl config use-context default --kubeconfig={{ k8s_dir }}kube-proxy.kubeconfig"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: bootstrap set-cluster
   shell: "{{ bin_dir }}kubectl config set-cluster kubernetes \
@@ -122,62 +122,62 @@
         --embed-certs=true \
         --server={{ KUBE_APISERVER }} \
         --kubeconfig={{ k8s_dir }}bootstrap.kubeconfig"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: bootstrap set-credentials
   shell: "{{ bin_dir }}kubectl config set-credentials kubelet-bootstrap \
         --token={{ BOOTSTRAP_TOKEN }} \
         --kubeconfig={{ k8s_dir }}bootstrap.kubeconfig"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: bootstrap set-context
   shell: "{{ bin_dir }}kubectl config set-context default \
     --cluster=kubernetes \
     --user=kubelet-bootstrap \
     --kubeconfig={{ k8s_dir }}bootstrap.kubeconfig"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: bootstrap set default context
   shell: "{{ bin_dir }}kubectl config use-context default --kubeconfig={{ k8s_dir }}bootstrap.kubeconfig"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: admin set-cluster
   shell: "{{ bin_dir }}kubectl config set-cluster kubernetes \
     --certificate-authority={{ ca_dir }}ca.pem \
     --embed-certs=true \
     --server={{ KUBE_APISERVER }}"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: admin set-credentials
   shell: "{{ bin_dir }}kubectl config set-credentials admin \
     --client-certificate={{ ca_dir }}admin.pem \
     --embed-certs=true \
     --client-key={{ ca_dir }}admin-key.pem"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: admin set-context
   shell: "{{ bin_dir }}kubectl config set-context kubernetes \
     --cluster=kubernetes --user=admin"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: admin set default context
   shell: "{{ bin_dir }}kubectl config use-context kubernetes"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: pull {{ k8s_dir }} tls
   synchronize: mode=pull src={{ k8s_dir }}{{ item }} dest=roles/cert/files/tls/{{ item }}
   with_items:
   - "bootstrap.kubeconfig"
   - "kube-proxy.kubeconfig"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: rm {{ ca_dir }}*
   shell: rm {{ ca_dir }}*
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: rm {{ etcd_ca_dir }}*
   shell: rm {{ etcd_ca_dir }}*
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: rm cfssl
   shell: rm {{ bin_dir }}{{ item }}
@@ -186,4 +186,4 @@
   - "cfssljson"
   - "cfssl-certinfo"
   - "kubectl"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"

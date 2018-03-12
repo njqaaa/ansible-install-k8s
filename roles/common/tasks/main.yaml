@@ -5,9 +5,6 @@
   shell: systemctl stop firewalld.service; \
          systemctl disable firewalld.service        
 
-- name: sync hosts
-  copy: src=hosts dest=/etc/hosts
-
 - name: sync limits.conf
   copy: src=limits.conf dest=/etc/security/limits.conf
 

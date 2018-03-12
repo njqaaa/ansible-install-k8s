@@ -20,6 +20,9 @@
          rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
   ignore_errors: true
 
+- name: sync hosts
+  copy: src=hosts dest=/etc/hosts
+
 - name: install latest kernel
   yum: name={{ item }} enablerepo=elrepo-kernel state=latest
   with_items:
@@ -27,7 +30,7 @@
   - "kernel-ml"
   ignore_errors: true
 
-- name: install socat for helm
+- name: install socat git
   yum: name={{ item }} state=latest
   with_items:
   - "socat"

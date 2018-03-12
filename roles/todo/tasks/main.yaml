@@ -1,17 +1,12 @@
 - name: kubectl create clusterrolebinding kubelet-bootstrap
   shell: "sleep 60 && {{ bin_dir }}kubectl create clusterrolebinding kubelet-bootstrap \
         --clusterrole=system:node --user=kubelet-bootstrap"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
-  ignore_errors: true
-
-- name: kubectl certificate approve
-  shell: "sleep 30 && kubectl get csr | grep -v 'NAME' | awk '{print $1}' | xargs kubectl certificate approve"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
   ignore_errors: true
 
 - name: kubectl taint masters NoSchedule
   shell: kubectl taint nodes {{ k8s_cluster }} key=value:NoSchedule
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
   ignore_errors: true
 
 - name: sync files addon
@@ -35,12 +30,12 @@
   with_items:
   - "calico-kube-controllers.yaml"
   - "kube-dns.yaml"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
 
 - name: deploy monitoring
   shell:  cd {{ k8s_addon_dir }}/monitoring && \
           ./deploy
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
   ignore_errors: true
 
 - name: kubectl apply -f  
@@ -49,9 +44,9 @@
   - "dashboard"
   - "ingress"
   - "fluentd-elasticsearch"
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"
   ignore_errors: true
 
 - name: create admin.p12
   shell: openssl pkcs12 -export -in {{ ca_dir }}admin.pem -out {{ ca_dir }}admin.p12 -inkey {{ ca_dir }}admin-key.pem -passout pass:{{ BASIC_AUTH_PASS }}
-  when: EXEC_MASTER is defined and EXEC_MASTER == "true"
+  when: EXEC is defined and EXEC == "true"

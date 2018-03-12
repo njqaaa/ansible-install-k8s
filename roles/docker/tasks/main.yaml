@@ -1,11 +1,17 @@
+- name: check docker exist
+  shell: /bin/docker -v
+  register: result
+  ignore_errors: True
+
 - name: curl -fsSL "https://get.docker.com/" | sh
   shell: curl -fsSL "https://get.docker.com/" | sh
+  when: result|failed
 
 - name: sync service
   template: src=service/docker.service dest=/usr/lib/systemd/system/docker.service
 
 - name: daocloud and private repo
-  template: src=templates/daemon.json dest=/etc/docker/daemon.json
+  template: src=daemon.json dest=/etc/docker/daemon.json
 
 - name: systemctl docker.service
   shell: systemctl daemon-reload && \

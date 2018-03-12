@@ -1,0 +1,17 @@
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+10.28.201.61 k8s-master-1
+10.28.201.62 k8s-master-2
+10.28.201.63 k8s-master-3
+10.28.201.61 k8s-etcd-1
+10.28.201.62 k8s-etcd-2
+10.28.201.63 k8s-etcd-3
+10.28.201.11 k8s-node-1
+10.28.201.12 k8s-node-2
+10.28.201.51 es-1
+10.28.201.52 es-2
+10.28.201.53 es-3
+10.28.201.71 ceph-manager
+10.28.201.72 ceph-mon-1
+10.28.201.75 ceph-osd-1
+10.28.201.76 ceph-osd-2

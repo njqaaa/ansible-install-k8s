@@ -24,13 +24,13 @@ metadata:
   name: kube-dns
   namespace: kube-system
   labels:
-    k8s-app: kube-dns
+    app: kube-dns
     #kubernetes.io/cluster-service: "true"
     addonmanager.kubernetes.io/mode: Reconcile
     kubernetes.io/name: "KubeDNS"
 spec:
   selector:
-    k8s-app: kube-dns
+    app: kube-dns
   clusterIP: {{ CLUSTER_DNS_SVC_IP }}
   ports:
   - name: dns
@@ -47,7 +47,7 @@ metadata:
   name: kube-dns
   namespace: kube-system
   labels:
-    k8s-app: kube-dns
+    app: kube-dns
     #kubernetes.io/cluster-service: "true"
     addonmanager.kubernetes.io/mode: Reconcile
 spec:
@@ -61,11 +61,11 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      k8s-app: kube-dns
+      app: kube-dns
   template:
     metadata:
       labels:
-        k8s-app: kube-dns
+        app: kube-dns
       annotations:
         scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
