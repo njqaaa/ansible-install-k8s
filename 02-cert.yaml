@@ -63,3 +63,17 @@
     with_items:
     - "etcd-key.pem"
     - "etcd.pem"
+
+- hosts: 'helm'
+  remote_user: root
+  tasks:
+  - name: initialize dir
+    file: name={{ item }} state=directory mode=0755
+    with_items:
+    - "{{ k8s_addon_dir }}"
+    - "/root/.kube"
+
+  - name: sync cert to {{ ca_dir }}
+    copy: src=roles/cert/files/tls/{{ item }} dest=/root/.kube/{{ item }}
+    with_items:
+    - "config"

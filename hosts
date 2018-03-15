@@ -16,6 +16,9 @@ k8s-master
 k8s-node
 k8s-etcd
 
+[helm]
+10.28.201.60 SERVER_NAME=k8s-helm
+
 # elasticsearch
 [es]
 10.28.201.51 SERVER_NAME=es-1
@@ -96,3 +99,5 @@ HARBOR_ADMIN_PASSWORD="Harbor12345"
 # BASIC_AUTH_USER 账号密码验证功能，需修改basic-auth.csv
 BASIC_AUTH_USER="admin"
 # BASIC_AUTH_PASS admin.p12 密码
+BASIC_AUTH_PASS="daf916d695c0b02975fa59f7805179ea"
+BOOTSTRAP_TOKEN="85d921f0c9944ecda9822b9b1427bdc0"

@@ -1,9 +1,3 @@
-- name: initialize dir
-  file: name={{ item }} state=directory mode=0755
-  with_items:
-  - "{{ k8s_addon_dir }}"
-  - "/root/.kubeconfig"
-
 - name: sync bin
   copy: src=bin/{{ item }} dest={{ bin_dir }}{{ item }} mode=0755
   with_items:

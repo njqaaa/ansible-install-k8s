@@ -62,6 +62,9 @@ ansible-playbook 08-es.yaml
 ansible-playbook 09-todo.yaml
 ansible-playbook 10-harbor.yaml
 
-# ceph-cluster is 90-ceph.yaml ，可以不安装
+# 以下可以不安装
+check_alive helm
+ansible-playbook 11-helm.yaml
+
 # check_alive ceph-cluster
 # ansible-playbook 90-ceph.yaml

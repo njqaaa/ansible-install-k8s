@@ -171,6 +171,12 @@
   - "kube-proxy.kubeconfig"
   when: EXEC is defined and EXEC == "true"
 
+- name: pull /root/.kube/config
+  synchronize: mode=pull src=/root/.kube/{{ item }} dest=roles/cert/files/tls/{{ item }}
+  with_items:
+  - "config"
+  when: EXEC is defined and EXEC == "true"
+
 - name: rm {{ ca_dir }}*
   shell: rm {{ ca_dir }}*
   when: EXEC is defined and EXEC == "true"
