@@ -22,5 +22,5 @@ nginx(nginx相关配置文件在项目lb_config下)
 
 ## 安装集群
 - ** clond该仓库，该机器需支持docker、git、ansible **
-- ** 需修改hosts与roles/common/files/hosts roles/todo/files/addon/ingress/下的server_name**
+- ** 需修改group_vars变量与roles/common/files/hosts roles/todo/files/addon/ingress/下的server_name**
 - ** 执行`install-k8s.sh`开始安装，其中es集群为非docker化 **

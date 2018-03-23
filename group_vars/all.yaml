@@ -1,0 +1,7 @@
+bin_dir: /usr/local/bin/
+k8s_addon_dir: /etc/kubernetes/addon/
+service_dir: /lib/systemd/system/
+
+
+# 网卡名
+IP_METHOD: eno16780032

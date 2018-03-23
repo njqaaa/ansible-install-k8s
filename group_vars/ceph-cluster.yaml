@@ -1,0 +1,3 @@
+ceph_user: ceph
+ceph_dir: /etc/ceph/
+ceph_osd_dir: /data/osd/

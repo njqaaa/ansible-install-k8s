@@ -1,0 +1,6 @@
+es_user: es
+es_cluster_name: fruitday-es
+es_dir: /opt/elasticsearch/
+es_head_dir: /opt/elasticsearch-head/
+es_bigdesk_dir: /opt/bigdesk/
+java_dir: /usr/local/java/

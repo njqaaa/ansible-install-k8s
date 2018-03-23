@@ -26,17 +26,19 @@ mv ${k8s_package_path}/helm/* ${helm_bin}
 
 # 创建随机密码
 admin_pass=$(head -c 16 /dev/urandom | od -An -t x | tr -d ' ')
-cat hosts |grep "BASIC_AUTH_PASS="
+k8s_vars_file="group_vars/k8s-cluster.yaml"
+cat ${k8s_vars_file} |grep "BASIC_AUTH_PASS: "
 if [[ $? -ne 0 ]];then
-    echo BASIC_AUTH_PASS=\"${admin_pass}\" >> hosts
+    echo BASIC_AUTH_PASS: ${admin_pass} >> ${k8s_vars_file}
 fi
 
 # 创建随机token
 bootstrap_token=$(head -c 16 /dev/urandom | od -An -t x | tr -d ' ')
-cat hosts |grep "BOOTSTRAP_TOKEN="
+cat ${k8s_vars_file} |grep "BOOTSTRAP_TOKEN: "
 if [[ $? -ne 0 ]];then
-    echo BOOTSTRAP_TOKEN=\"${bootstrap_token}\" >> hosts
+    echo BOOTSTRAP_TOKEN: ${bootstrap_token} >> ${k8s_vars_file}
 fi
+exit
 function check_alive() {
     group_name=$1
     # check ssh是否正常
