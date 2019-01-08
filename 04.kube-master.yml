@@ -4,8 +4,8 @@
   - kube-master
   - kube-node
   tasks:
-  - name: Making master nodes SchedulingDisabled
-    shell: "{{ BASE_K8S_DIR }}/kubectl cordon {{ inventory_hostname }} "
+  - name: Making master nodes taint
+    shell: "{{ BASE_K8S_DIR }}/kubectl taint nodes {{ inventory_hostname }} node-role.kubernetes.io/master=:NoSchedule"
     delegate_to: "{{ groups.deploy[0] }}"
     when: DEPLOY_MODE != "allinone"
     ignore_errors: true
