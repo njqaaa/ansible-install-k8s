@@ -95,7 +95,7 @@ spec:
           mountPath: /lib/modules
           readOnly: true
         - name: cni-conf-dir
-          mountPath: /etc/cni/net.d
+          mountPath: {{ CNI_NET_DIR }}
         - name: kubeconfig
           mountPath: /var/lib/kube-router
           readOnly: true
@@ -107,10 +107,10 @@ spec:
         - /bin/sh
         - -c
         - set -e -x;
-          if [ ! -f /etc/cni/net.d/10-kuberouter.conf ]; then
-            TMP=/etc/cni/net.d/.tmp-kuberouter-cfg;
+          if [ ! -f {{ CNI_NET_DIR }}/10-kuberouter.conf ]; then
+            TMP={{ CNI_NET_DIR }}/.tmp-kuberouter-cfg;
             cp /etc/kube-router/cni-conf.json ${TMP};
-            mv ${TMP} /etc/cni/net.d/10-kuberouter.conf;
+            mv ${TMP} {{ CNI_NET_DIR }}/10-kuberouter.conf;
           fi;
           if [ ! -f /var/lib/kube-router/kubeconfig ]; then
             TMP=/var/lib/kube-router/.tmp-kubeconfig;
@@ -118,7 +118,7 @@ spec:
             mv ${TMP} /var/lib/kube-router/kubeconfig;
           fi
         volumeMounts:
-        - mountPath: /etc/cni/net.d
+        - mountPath: {{ CNI_NET_DIR }}
           name: cni-conf-dir
         - mountPath: /etc/kube-router
           name: kube-router-cfg
@@ -137,7 +137,7 @@ spec:
           path: /lib/modules
       - name: cni-conf-dir
         hostPath:
-          path: /etc/cni/net.d
+          path: {{ CNI_NET_DIR }}
       - name: kube-router-cfg
         configMap:
           name: kube-router-cfg

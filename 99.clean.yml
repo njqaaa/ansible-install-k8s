@@ -104,23 +104,23 @@
 
   - name: cleanup iptables
     shell: "iptables -F && iptables -X \
-	&& iptables -F -t nat && iptables -X -t nat \
-	&& iptables -F -t raw && iptables -X -t raw \
-	&& iptables -F -t mangle && iptables -X -t mangle"
+        && iptables -F -t nat && iptables -X -t nat \
+        && iptables -F -t raw && iptables -X -t raw \
+        && iptables -F -t mangle && iptables -X -t mangle"
 
   - name: cleanup networks
     shell: "ip link del docker0; \
-	ip link del tunl0; \
-	ip link del flannel.1; \
-	ip link del cni0; \
+        ip link del tunl0; \
+        ip link del flannel.1; \
+        ip link del cni0; \
         ip link del mynet0; \
-	ip link del kube-bridge; \
+        ip link del kube-bridge; \
         ip link del dummy0; \
         ip link del kube-ipvs0; \
         ip link del cilium_net; \
         ip link del cilium_vxlan; \
-	systemctl restart networking; \
-	systemctl restart network"
+        systemctl restart networking; \
+        systemctl restart network"
     ignore_errors: true
 
   - name: cleanup 'calico' routes
@@ -179,11 +179,11 @@
     tags: rm_ntp 
     when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
 
-  - name: stop and disable chronyd in CentOS
+  - name: stop and disable chronyd in CentOS/RedHat
     service: name=chronyd state=stopped enabled=no
     ignore_errors: true
     tags: rm_ntp 
-    when: ansible_distribution == "CentOS" 
+    when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
 
   - name: clean certs and keys
     file: name={{ item }} state=absent

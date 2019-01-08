@@ -9,7 +9,7 @@
 
 - name: 准备指定的备份etcd 数据
   copy: 
-    src: "{{ base_dir }}/roles/cluster-backup/files/snapshot/{{ db_to_restore }}"
+    src: "{{ BASE_DIR }}/roles/cluster-backup/files/snapshot/{{ db_to_restore }}"
     dest: "/backup/k8s/snapshot.db"
 
 - name: 清理原备份出来数据
@@ -17,7 +17,7 @@
 
 - name: etcd 数据恢复
   shell: "cd /backup/k8s && \
-	ETCDCTL_API=3 {{ bin_dir }}/etcdctl snapshot restore snapshot.db \
+	ETCDCTL_API=3 {{ BIN_DIR }}/etcdctl snapshot restore snapshot.db \
 	--name {{ NODE_NAME }} \
 	--initial-cluster {{ ETCD_NODES }} \
 	--initial-cluster-token etcd-cluster-0 \

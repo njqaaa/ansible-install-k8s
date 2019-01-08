@@ -87,13 +87,13 @@ spec:
           image: registry.cn-hangzhou.aliyuncs.com/acs/alicloud-disk-controller:v1.9.3-ed710ce
           volumeMounts:
             - name: cloud-config
-              mountPath: /etc/kubernetes/
+              mountPath: {{ K8S_DIR }}/
             - name: logdir
               mountPath: /var/log/alicloud/
       volumes:
         - name: cloud-config
           hostPath:
-            path: /etc/kubernetes/
+            path: {{ K8S_DIR }}/
         - name: logdir
           hostPath:
             path: /var/log/alicloud/

@@ -7,28 +7,28 @@ Requires=docker.service
 [Service]
 WorkingDirectory=/var/lib/kubelet
 #--pod-infra-container-image=registry.access.redhat.com/rhel7/pod-infrastructure:latest
-ExecStart={{ bin_dir }}/kubelet \
+ExecStart={{ BIN_DIR }}/kubelet \
   --address={{ ansible_default_ipv4.address }} \
   --allow-privileged=true \
   --anonymous-auth=false \
   --authentication-token-webhook \
   --authorization-mode=Webhook \
-  --client-ca-file={{ ca_dir }}/ca.pem \
+  --client-ca-file={{ CA_DIR }}/ca.pem \
   --cluster-dns={{ CLUSTER_DNS_SVC_IP }} \
   --cluster-domain={{ CLUSTER_DNS_DOMAIN }} \
-  --cni-bin-dir={{ bin_dir }} \
-  --cni-conf-dir=/etc/cni/net.d \
+  --cni-bin-dir={{ BIN_DIR }} \
+  --cni-conf-dir={{ CNI_NET_DIR }} \
   --fail-swap-on=false \
   --hairpin-mode hairpin-veth \
   --hostname-override={{ inventory_hostname }} \
-  --kubeconfig=/etc/kubernetes/kubelet.kubeconfig \
+  --kubeconfig={{ K8S_DIR }}/kubelet.kubeconfig \
   --max-pods={{ MAX_PODS }} \
   --network-plugin=cni \
   --pod-infra-container-image=mirrorgooglecontainers/pause-amd64:3.1 \
   --register-node=true \
   --root-dir={{ KUBELET_ROOT_DIR }} \
-  --tls-cert-file={{ ca_dir }}/kubelet.pem \
-  --tls-private-key-file={{ ca_dir }}/kubelet-key.pem \
+  --tls-cert-file={{ CA_DIR }}/kubelet.pem \
+  --tls-private-key-file={{ CA_DIR }}/kubelet-key.pem \
   --v=2
 #kubelet cAdvisor 默认在所有接口监听 4194 端口的请求, 以下iptables限制内网访问
 ExecStartPost=/sbin/iptables -A INPUT -s 10.0.0.0/8 -p tcp --dport 4194 -j ACCEPT

@@ -4,17 +4,17 @@
   with_items:
   - /var/lib/kubelet
   - /var/lib/kube-proxy
-  - /etc/cni/net.d
+  - "{{ CNI_NET_DIR }}"
 
 - name: 下载 kubelet,kube-proxy
-  copy: src={{ base_k8s_dir }}/bin/{{ item }} dest={{ bin_dir }}/{{ item }} mode=0755
+  copy: src={{ BASE_K8S_DIR }}/{{ item }} dest={{ BIN_DIR }}/{{ item }} mode=0755
   with_items:
   - kubelet
   - kube-proxy
   tags: upgrade_k8s
 
 - name: 下载 cni plugins
-  copy: src={{ base_cni_dir }}/bin/{{ item }} dest={{ bin_dir }}/{{ item }} mode=0755
+  copy: src={{ BASE_CNI_DIR }}/{{ item }} dest={{ BIN_DIR }}/{{ item }} mode=0755
   with_items:
   - bridge
   - host-local
@@ -23,48 +23,48 @@
 
 ##----------kubelet 配置部分--------------
 - name: 准备kubelet 证书签名请求
-  template: src=kubelet-csr.json.j2 dest={{ ca_dir }}/kubelet-csr.json
+  template: src=kubelet-csr.json.j2 dest={{ CA_DIR }}/kubelet-csr.json
 
 - name: 创建 kubelet 证书与私钥
-  shell: "cd {{ ca_dir }} && {{ bin_dir }}/cfssl gencert \
-        -ca={{ ca_dir }}/ca.pem \
-        -ca-key={{ ca_dir }}/ca-key.pem \
-        -config={{ ca_dir }}/ca-config.json \
-        -profile=kubernetes kubelet-csr.json | {{ bin_dir }}/cfssljson -bare kubelet"
+  shell: "cd {{ CA_DIR }} && {{ BIN_DIR }}/cfssl gencert \
+        -ca={{ CA_DIR }}/ca.pem \
+        -ca-key={{ CA_DIR }}/ca-key.pem \
+        -config={{ CA_DIR }}/ca-config.json \
+        -profile=kubernetes kubelet-csr.json | {{ BIN_DIR }}/cfssljson -bare kubelet"
 
 # 创建kubelet.kubeconfig 
 - name: 设置集群参数
-  shell: "{{ bin_dir }}/kubectl config set-cluster kubernetes \
-        --certificate-authority={{ ca_dir }}/ca.pem \
+  shell: "{{ BIN_DIR }}/kubectl config set-cluster kubernetes \
+        --certificate-authority={{ CA_DIR }}/ca.pem \
         --embed-certs=true \
         --server={{ KUBE_APISERVER }} \
 	--kubeconfig=kubelet.kubeconfig"
 
 - name: 设置客户端认证参数
-  shell: "{{ bin_dir }}/kubectl config set-credentials system:node:{{ inventory_hostname }} \
-        --client-certificate={{ ca_dir }}/kubelet.pem \
+  shell: "{{ BIN_DIR }}/kubectl config set-credentials system:node:{{ inventory_hostname }} \
+        --client-certificate={{ CA_DIR }}/kubelet.pem \
         --embed-certs=true \
-        --client-key={{ ca_dir }}/kubelet-key.pem \
+        --client-key={{ CA_DIR }}/kubelet-key.pem \
 	--kubeconfig=kubelet.kubeconfig"
 
 - name: 设置上下文参数
-  shell: "{{ bin_dir }}/kubectl config set-context default \
+  shell: "{{ BIN_DIR }}/kubectl config set-context default \
         --cluster=kubernetes \
 	--user=system:node:{{ inventory_hostname }} \
 	--kubeconfig=kubelet.kubeconfig"
 
 - name: 选择默认上下文
-  shell: "{{ bin_dir }}/kubectl config use-context default \
+  shell: "{{ BIN_DIR }}/kubectl config use-context default \
 	--kubeconfig=kubelet.kubeconfig"
 
 - name: 移动 kubelet.kubeconfig
-  shell: "mv /root/kubelet.kubeconfig /etc/kubernetes/"
+  shell: "mv /root/kubelet.kubeconfig {{ K8S_DIR }}/"
 
 - name: 准备 cni配置文件
-  template: src=cni-default.conf.j2 dest=/etc/cni/net.d/10-default.conf
+  template: src=cni-default.conf.j2 dest={{ CNI_NET_DIR }}/10-default.conf
 
 - name: 创建kubelet的systemd unit文件
-  template: src=kubelet.service.j2 dest=/etc/systemd/system/kubelet.service
+  template: src=kubelet.service.j2 dest={{ SYSTEMD_DIR }}/kubelet.service
   tags: upgrade_k8s, restart_node 
 
 - name: 开机启用kubelet 服务
@@ -77,12 +77,12 @@
 
 ##-------kube-proxy部分----------------
 - name: 安装kube-proxy.kubeconfig配置文件
-  synchronize: src=/etc/kubernetes/kube-proxy.kubeconfig dest=/etc/kubernetes/kube-proxy.kubeconfig
+  synchronize: src={{ K8S_DIR }}/kube-proxy.kubeconfig dest={{ K8S_DIR }}/kube-proxy.kubeconfig
   delegate_to: "{{ groups.deploy[0] }}"
 
 - name: 创建kube-proxy 服务文件
   tags: reload-kube-proxy, upgrade_k8s, restart_node
-  template: src=kube-proxy.service.j2 dest=/etc/systemd/system/kube-proxy.service
+  template: src=kube-proxy.service.j2 dest={{ SYSTEMD_DIR }}/kube-proxy.service
 
 - name: 开机启用kube-proxy 服务
   shell: systemctl enable kube-proxy
@@ -101,20 +101,20 @@
   delay: 2
 
 #- name: 获取csr 请求信息
-#  shell: "sleep 3 && {{ bin_dir }}/kubectl get csr"
+#  shell: "sleep 3 && {{ BIN_DIR }}/kubectl get csr"
 #  delegate_to: "{{ groups.deploy[0] }}"
 #  register: csr_info
 #  run_once: true
 
 #- name: approve-kubelet-csr
-#  shell: "{{ bin_dir }}/kubectl get csr|grep 'Pending' | awk 'NR>0{print $1}'| \
-#        xargs {{ bin_dir }}/kubectl certificate approve"
+#  shell: "{{ BIN_DIR }}/kubectl get csr|grep 'Pending' | awk 'NR>0{print $1}'| \
+#        xargs {{ BIN_DIR }}/kubectl certificate approve"
 #  when: '"Pending" in csr_info.stdout'
 #  delegate_to: "{{ groups.deploy[0] }}"
 #  run_once: true
 
 - name: 轮询等待node达到Ready状态
-  shell: "{{ bin_dir }}/kubectl get node {{ inventory_hostname }}|awk 'NR>1{print $2}'"
+  shell: "{{ BASE_K8S_DIR }}/kubectl get node {{ inventory_hostname }}|awk 'NR>1{print $2}'"
   register: node_status
   delegate_to: "{{ groups.deploy[0] }}"
   until: node_status.stdout == "Ready" or node_status.stdout == "Ready,SchedulingDisabled"
@@ -123,6 +123,6 @@
   tags: upgrade_k8s, restart_node
 
 - name: 设置node节点role
-  shell: "{{ bin_dir }}/kubectl label node {{ inventory_hostname }} kubernetes.io/role=node --overwrite"
+  shell: "{{ BASE_K8S_DIR }}/kubectl label node {{ inventory_hostname }} kubernetes.io/role=node --overwrite"
   ignore_errors: true
   delegate_to: "{{ groups.deploy[0] }}"

@@ -1,7 +1,7 @@
 # 国内镜像加速
 
-REG_MIRROR_1: "http://f1361db2.m.daocloud.io"
-REG_MIRROR_2: "https://registry.docker-cn.com"
+REG_MIRROR_1: "https://mus1g88v.mirror.aliyuncs.com"
+REG_MIRROR_2: "http://f1361db2.m.daocloud.io"
 
 # docker日志相关
 

@@ -14,13 +14,13 @@ vrrp_instance VI-kube-master {
     unicast_src_ip {{ ansible_default_ipv4.address }}
     unicast_peer {
 {% for h in groups['lb'] %}
-    {% if hostvars[h]['ip'] != ansible_default_ipv4.address %}
-        {{ hostvars[h]['ip'] }}
+    {% if hostvars[h]['ansible_host'] != ansible_default_ipv4.address %}
+        {{ hostvars[h]['ansible_host'] }}
     {% endif %}
 {% endfor %}
     }
     dont_track_primary
-    interface {{ LB_IF }}
+    interface {{ K8S_INTERFACE }}
     virtual_router_id {{ ROUTER_ID }} 
     advert_int 3
     track_script {

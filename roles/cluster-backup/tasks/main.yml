@@ -3,7 +3,7 @@
 
 - name: 执行etcd 数据备份
   shell: "cd /backup/k8s && \
-	ETCDCTL_API=3 {{ bin_dir }}/etcdctl snapshot save snapshot.db"
+	ETCDCTL_API=3 {{ BIN_DIR }}/etcdctl snapshot save snapshot.db"
 
 - name: 获取etcd 数据备份
   fetch:

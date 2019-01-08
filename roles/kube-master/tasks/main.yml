@@ -1,5 +1,8 @@
+- name: 自动补全
+  shell: echo "source <(kubectl completion bash)" > /etc/profile.d/k8s.sh
+
 - name: 下载 kube-master 二进制
-  copy: src={{ base_k8s_dir }}/bin/{{ item }} dest={{ bin_dir }}/{{ item }} mode=0755
+  copy: src={{ BASE_K8S_DIR }}/{{ item }} dest={{ BIN_DIR }}/{{ item }} mode=0755
   with_items:
   - kube-apiserver
   - kube-controller-manager
@@ -7,49 +10,49 @@
   tags: upgrade_k8s
 
 - name: 创建 kubernetes 证书签名请求
-  template: src=kubernetes-csr.json.j2 dest={{ ca_dir }}/kubernetes-csr.json
+  template: src=kubernetes-csr.json.j2 dest={{ CA_DIR }}/kubernetes-csr.json
   tags: change_cert
 
 - name: 创建 kubernetes 证书和私钥
-  shell: "cd {{ ca_dir }} && {{ bin_dir }}/cfssl gencert \
-        -ca={{ ca_dir }}/ca.pem \
-        -ca-key={{ ca_dir }}/ca-key.pem \
-        -config={{ ca_dir }}/ca-config.json \
-        -profile=kubernetes kubernetes-csr.json | {{ bin_dir }}/cfssljson -bare kubernetes"
+  shell: "cd {{ CA_DIR }} && {{ BIN_DIR }}/cfssl gencert \
+        -ca={{ CA_DIR }}/ca.pem \
+        -ca-key={{ CA_DIR }}/ca-key.pem \
+        -config={{ CA_DIR }}/ca-config.json \
+        -profile=kubernetes kubernetes-csr.json | {{ BIN_DIR }}/cfssljson -bare kubernetes"
   tags: change_cert
 
 # 创建aggregator proxy相关证书
 - name: 创建 aggregator proxy证书签名请求
-  template: src=aggregator-proxy-csr.json.j2 dest={{ ca_dir }}/aggregator-proxy-csr.json
+  template: src=aggregator-proxy-csr.json.j2 dest={{ CA_DIR }}/aggregator-proxy-csr.json
   tags: upgrade_k8s
 
 - name: 创建 aggregator-proxy证书和私钥
-  shell: "cd {{ ca_dir }} && {{ bin_dir }}/cfssl gencert \
-        -ca={{ ca_dir }}/ca.pem \
-        -ca-key={{ ca_dir }}/ca-key.pem \
-        -config={{ ca_dir }}/ca-config.json \
-        -profile=kubernetes aggregator-proxy-csr.json | {{ bin_dir }}/cfssljson -bare aggregator-proxy"
+  shell: "cd {{ CA_DIR }} && {{ BIN_DIR }}/cfssl gencert \
+        -ca={{ CA_DIR }}/ca.pem \
+        -ca-key={{ CA_DIR }}/ca-key.pem \
+        -config={{ CA_DIR }}/ca-config.json \
+        -profile=kubernetes aggregator-proxy-csr.json | {{ BIN_DIR }}/cfssljson -bare aggregator-proxy"
   tags: upgrade_k8s
 
 - name: 创建 basic-auth.csv
-  template: src=basic-auth.csv.j2 dest={{ ca_dir }}/basic-auth.csv
+  template: src=basic-auth.csv.j2 dest={{ CA_DIR }}/basic-auth.csv
 
 - name: 创建kube-apiserver的systemd unit文件
-  template: src=kube-apiserver.service.j2 dest=/etc/systemd/system/kube-apiserver.service
+  template: src=kube-apiserver.service.j2 dest={{ SYSTEMD_DIR }}/kube-apiserver.service
   tags: upgrade_k8s, restart_master
 
 # 为兼容之前的模式，需特别对v1.8版本重新配置kube-apiserver的systemd unit文件
 - name: 创建kube-apiserver v1.8的systemd unit文件
-  template: src=kube-apiserver-{{ K8S_VER }}.service.j2 dest=/etc/systemd/system/kube-apiserver.service
+  template: src=kube-apiserver-{{ K8S_VER }}.service.j2 dest={{ SYSTEMD_DIR }}/kube-apiserver.service
   tags: upgrade_k8s, restart_master
   when: "K8S_VER is defined and K8S_VER == 'v1.8'"
 
 - name: 创建kube-controller-manager的systemd unit文件
-  template: src=kube-controller-manager.service.j2 dest=/etc/systemd/system/kube-controller-manager.service
+  template: src=kube-controller-manager.service.j2 dest={{ SYSTEMD_DIR }}/kube-controller-manager.service
   tags: upgrade_k8s, restart_master
 
 - name: 创建kube-scheduler的systemd unit文件
-  template: src=kube-scheduler.service.j2 dest=/etc/systemd/system/kube-scheduler.service
+  template: src=kube-scheduler.service.j2 dest={{ SYSTEMD_DIR }}/kube-scheduler.service
   tags: upgrade_k8s, restart_master
 
 - name: enable master 服务
@@ -62,7 +65,8 @@
   tags: upgrade_k8s, restart_master
 
 - name: 以轮询的方式等待master服务启动完成
-  command: "{{ bin_dir }}/kubectl get node"
+#  command: "{{ BIN_DIR }}/kubectl get node"
+  command: "{{ BASE_K8S_DIR }}/kubectl get node"
   register: result
   until:    result.rc == 0
   retries:  5

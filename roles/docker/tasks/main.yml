@@ -2,11 +2,10 @@
 - name: 准备docker相关目录
   file: name={{ item }} state=directory
   with_items:
-  - "{{ bin_dir }}"
-  - /etc/docker
+  - DOCKER_DIR
 
 - name: 下载 docker 二进制文件
-  copy: src={{ base_docker_dir }}/bin/{{ item }} dest={{ bin_dir }}/{{ item }} mode=0755
+  copy: src={{ BASE_DOCKER_DIR }}/{{ item }} dest={{ BIN_DIR }}/{{ item }} mode=0755
   with_items:
   - containerd
   - containerd-shim
@@ -19,10 +18,10 @@
   tags: upgrade_docker, download_docker
 
 - name: docker命令自动补全
-  copy: src=docker dest=/etc/bash_completion.d/docker mode=0644
+  copy: src=docker.sh dest=/etc/profile.d/docker.sh mode=0644
 
 - name: docker国内镜像加速
-  template: src=daemon.json.j2 dest=/etc/docker/daemon.json
+  template: src=daemon.json.j2 dest=DOCKER_DIR/daemon.json
 
 - name: flush-iptables
   shell: "iptables -F && iptables -X \
@@ -31,7 +30,7 @@
         && iptables -F -t mangle && iptables -X -t mangle"
 
 - name: 创建docker的systemd unit文件
-  template: src=docker.service.j2 dest=/etc/systemd/system/docker.service
+  template: src=docker.service.j2 dest={{ SYSTEMD_DIR }}/docker.service
   tags: upgrade_docker, download_docker
 
 - name: 开机启用docker 服务

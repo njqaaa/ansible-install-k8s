@@ -5,12 +5,12 @@
 - hosts: deploy
   tasks: 
   - name: Restoring dirs of CA sth
-    file: name=/etc/kubernetes/ssl/ state=directory
+    file: name={{ CA_DIR }}/ state=directory
 
   - name: Restoring CA sth
     copy: 
-      src: "{{ base_dir }}/roles/cluster-backup/files/ca/{{ item }}"
-      dest: "{{ ca_dir }}/{{ item }}"
+      src: "{{ BASE_DIR }}/roles/cluster-backup/files/ca/{{ item }}"
+      dest: "{{ CA_DIR }}/{{ item }}"
     with_items:
     - ca.pem
     - ca-key.pem
@@ -56,12 +56,12 @@
   # 
   tasks:
   - name: Making master nodes SchedulingDisabled
-    shell: "{{ bin_dir }}/kubectl cordon {{ inventory_hostname }} "
+    shell: "{{ BASE_K8S_DIR }}/kubectl cordon {{ inventory_hostname }} "
     when: DEPLOY_MODE != "allinone"
     ignore_errors: true
 
   - name: Setting master role name
-    shell: "{{ bin_dir }}/kubectl label node {{ inventory_hostname }} kubernetes.io/role=master --overwrite"
+    shell: "{{ BASE_K8S_DIR }}/kubectl label node {{ inventory_hostname }} kubernetes.io/role=master --overwrite"
     ignore_errors: true
 
 # to set up 'kube-node' nodes

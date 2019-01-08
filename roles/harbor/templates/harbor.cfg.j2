@@ -20,8 +20,8 @@ max_job_workers = 50
 customize_crt = on
 
 #The path of cert and key files for nginx, they are applied only the protocol is set to https
-ssl_cert = {{ ca_dir }}/harbor.pem
-ssl_cert_key = {{ ca_dir }}/harbor-key.pem
+ssl_cert = {{ CA_DIR }}/harbor.pem
+ssl_cert_key = {{ CA_DIR }}/harbor-key.pem
 
 #The path of secretkey storage
 secretkey_path = /data

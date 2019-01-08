@@ -11,7 +11,7 @@
 
 - block:
     - name: 下载docker compose 二进制文件
-      copy: src={{ base_docker_dir }}/bin/docker-compose dest={{ bin_dir }}/docker-compose mode=0755
+      copy: src={{ BASE_DOCKER_DIR }}/docker-compose dest={{ BIN_DIR }}/docker-compose mode=0755
 
     - name: 安装解压工具
       package: name={{ item }} state=present
@@ -21,30 +21,30 @@
     
     - name: 解压harbor离线安装包
       unarchive: 
-        src: "{{ base_dir }}/down/harbor-offline-installer-{{ HARBOR_VER }}.zip"
+        src: "{{ BASE_DIR }}/down/harbor-offline-installer-{{ HARBOR_VER }}.zip"
         dest: /data
         copy: yes
         keep_newer: yes
         mode: 0755
     
     - name: 导入harbor所需 docker images
-      shell: "{{ bin_dir }}/docker load -i /data/harbor/harbor.{{ HARBOR_VER }}.tar.gz"
+      shell: "{{ BIN_DIR }}/docker load -i /data/harbor/harbor.{{ HARBOR_VER }}.tar.gz"
     
     - name: 创建harbor证书请求
-      template: src=harbor-csr.json.j2 dest={{ ca_dir }}/harbor-csr.json
+      template: src=harbor-csr.json.j2 dest={{ CA_DIR }}/harbor-csr.json
     
     - name: 创建harbor证书和私钥
-      shell: "cd {{ ca_dir }} && {{ bin_dir }}/cfssl gencert \
-            -ca={{ ca_dir }}/ca.pem \
-            -ca-key={{ ca_dir }}/ca-key.pem \
-            -config={{ ca_dir }}/ca-config.json \
-            -profile=kubernetes harbor-csr.json | {{ bin_dir }}/cfssljson -bare harbor"
+      shell: "cd {{ CA_DIR }} && {{ BIN_DIR }}/cfssl gencert \
+            -ca={{ CA_DIR }}/ca.pem \
+            -ca-key={{ CA_DIR }}/ca-key.pem \
+            -config={{ CA_DIR }}/ca-config.json \
+            -profile=kubernetes harbor-csr.json | {{ BIN_DIR }}/cfssljson -bare harbor"
     
     - name: 配置 harbor.cfg 文件
       template: src=harbor.cfg.j2 dest=/data/harbor/harbor.cfg
     
     - name: 安装 harbor
       shell: "cd /data/harbor && \
-    	export PATH={{ bin_dir }}:$PATH && \
+    	export PATH={{ BIN_DIR }}:$PATH && \
     	 ./install.sh  --with-clair"
   when: '"registry" not in result.stdout'

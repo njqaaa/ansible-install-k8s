@@ -1,8 +1,18 @@
+# 自动设置LB节点变量'K8S_INTERFACE'
+- name: 注册变量 K8S_INTERFACE_TMP
+  shell: "ip a|grep '{{ ansible_default_ipv4.address }}/'|awk '{print $NF}'"
+  register: K8S_INTERFACE_TMP
+
+- name: 设置变量 K8S_INTERFACE
+  lineinfile:
+    dest: /etc/ansible/hosts
+    regexp: '^K8S_INTERFACE='
+    line: 'K8S_INTERFACE="{{ K8S_INTERFACE_TMP.stdout }}"'
+  connection: local
+
 - name: Assign inventory name to hostnames
   hostname:
     name: "{{inventory_hostname}}"
-
-- import_tasks: etchosts.yml
 
 # 禁用系统swap
 - name: 禁用系统 swap
@@ -24,7 +34,6 @@
     - ip_vs_rr
     - ip_vs_wrr
     - ip_vs_sh
-    - nf_conntrack_ipv4
   ignore_errors: true
 
 - name: 加载nf_conntrack for kernel 4.19
@@ -40,3 +49,4 @@
 - name: 生效系统参数
   shell: "sysctl -p /etc/sysctl.d/95-k8s-sysctl.conf"
   ignore_errors: true
+

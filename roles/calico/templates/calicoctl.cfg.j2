@@ -4,6 +4,6 @@ metadata:
 spec:
   datastoreType: "etcdv3"
   etcdEndpoints: {{ ETCD_ENDPOINTS }}
-  etcdKeyFile: /etc/calico/ssl/calico-key.pem
-  etcdCertFile: /etc/calico/ssl/calico.pem
-  etcdCACertFile: {{ ca_dir }}/ca.pem 
+  etcdKeyFile: {{ CALICO_CA_DIR }}/calico-key.pem
+  etcdCertFile: {{ CALICO_CA_DIR }}/calico.pem
+  etcdCACertFile: {{ CA_DIR }}/ca.pem 

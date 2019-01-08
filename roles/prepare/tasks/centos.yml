@@ -1,4 +1,4 @@
-- name: 删除centos默认安装
+- name: 卸载防火墙
   yum: 
     name: 
       - firewalld
@@ -21,6 +21,8 @@
       - rsync               # 文件同步工具，分发证书等配置文件需要
       - ipset
       - ipvsadm
+      - mlocate
+      - strace
     state: latest
 
 - name: 临时关闭 selinux

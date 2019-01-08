@@ -7,10 +7,10 @@ After=network.target
 # kube-proxy 根据 --cluster-cidr 判断集群内部和外部流量，指定 --cluster-cidr 或 --masquerade-all 选项后
 # kube-proxy 会对访问 Service IP 的请求做 SNAT，这个特性与calico 实现 network policy冲突，因此禁用
 WorkingDirectory=/var/lib/kube-proxy
-ExecStart={{ bin_dir }}/kube-proxy \
+ExecStart={{ BIN_DIR }}/kube-proxy \
   --bind-address={{ ansible_default_ipv4.address }} \
   --hostname-override={{ inventory_hostname }} \
-  --kubeconfig=/etc/kubernetes/kube-proxy.kubeconfig \
+  --kubeconfig={{ K8S_DIR }}/kube-proxy.kubeconfig \
   --logtostderr=true \
   --proxy-mode={{ PROXY_MODE }}
 Restart=on-failure
