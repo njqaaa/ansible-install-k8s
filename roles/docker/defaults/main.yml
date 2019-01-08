@@ -1,0 +1,14 @@
+# 国内镜像加速
+
+REG_MIRROR_1: "http://f1361db2.m.daocloud.io"
+REG_MIRROR_2: "https://registry.docker-cn.com"
+
+# docker日志相关
+
+LOG_DRIVER: "json-file"
+LOG_LEVEL: "warn"
+LOG_MAX_SIZE: "10m"
+LOG_MAX_FILE: 3
+
+# docker容器存储目录
+STORAGE_DIR: "/var/lib/docker"

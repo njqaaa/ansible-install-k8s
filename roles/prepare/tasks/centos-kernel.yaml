@@ -1,0 +1,22 @@
+- name: get kernel version
+  shell: uname -r
+  register: kversion 
+
+- name: rpm kernel
+  shell: rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org && \
+         rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
+  when: "'3.1' in kversion.stdout"
+  ignore_errors: true
+
+- name: install latest kernel
+  yum: name={{ item }} enablerepo=elrepo-kernel state=latest
+  with_items:
+  - "kernel-ml-devel"
+  - "kernel-ml"
+  when: "'3.1' in kversion.stdout"
+  ignore_errors: true
+
+- name: update kernel
+  shell: grub2-set-default 0 \
+         && reboot
+  when: "'3.1' in kversion.stdout"
