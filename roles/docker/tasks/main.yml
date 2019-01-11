@@ -2,7 +2,7 @@
 - name: 准备docker相关目录
   file: name={{ item }} state=directory
   with_items:
-  - DOCKER_DIR
+  - '{{ DOCKER_DIR }}'
 
 - name: 下载 docker 二进制文件
   copy: src={{ BASE_DOCKER_DIR }}/{{ item }} dest={{ BIN_DIR }}/{{ item }} mode=0755
@@ -21,7 +21,7 @@
   copy: src=docker.sh dest=/etc/profile.d/docker.sh mode=0644
 
 - name: docker国内镜像加速
-  template: src=daemon.json.j2 dest=DOCKER_DIR/daemon.json
+  template: src=daemon.json.j2 dest={{ DOCKER_DIR }}/daemon.json
 
 - name: flush-iptables
   shell: "iptables -F && iptables -X \

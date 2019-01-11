@@ -2,58 +2,29 @@
   copy: src={{ BASE_HELM_DIR }}/helm dest={{ BIN_DIR }}/helm mode=0755
 
 - name: 自动补全
-  shell: echo "source <(kubectl helm bash)" > /etc/profile.d/helm.sh
-
-- name: 创建helm 客户端证书请求
-  template: src=helm-csr.json.j2 dest={{ CA_DIR }}/{{ helm_cert_cn }}-csr.json
-
-- name: 创建helm 客户端证书
-  shell: "cd {{ CA_DIR }} && {{ BIN_DIR }}/cfssl gencert \
-        -ca={{ CA_DIR }}/ca.pem \
-        -ca-key={{ CA_DIR }}/ca-key.pem \
-        -config={{ CA_DIR }}/ca-config.json \
-        -profile=kubernetes {{ helm_cert_cn }}-csr.json | {{ BIN_DIR }}/cfssljson -bare {{ helm_cert_cn }}"
-
-- name: 创建tiller 服务端证书请求
-  template: src=tiller-csr.json.j2 dest={{ CA_DIR }}/{{ tiller_cert_cn }}-csr.json
-
-- name: 创建tiller 服务端证书和私钥
-  shell: "cd {{ CA_DIR }} && {{ BIN_DIR }}/cfssl gencert \
-        -ca={{ CA_DIR }}/ca.pem \
-        -ca-key={{ CA_DIR }}/ca-key.pem \
-        -config={{ CA_DIR }}/ca-config.json \
-        -profile=kubernetes {{ tiller_cert_cn }}-csr.json | {{ BIN_DIR }}/cfssljson -bare {{ tiller_cert_cn }}"
+  shell: echo "source <(helm completion bash)" > /etc/profile.d/helm.sh
 
 - name: 准备rbac配置
-  template: src=helm-rbac.yaml.j2 dest=./helm-rbac.yaml
+  template: src=helm-rbac.yaml.j2 dest={{ K8S_YAML_DIR }}/helm-rbac.yaml
 
 - name: 在k8s上创建rbac
-  shell: "{{ BIN_DIR }}/kubectl apply -f ./helm-rbac.yaml"
+  shell: "{{ BASE_K8S_DIR }}/kubectl apply -f {{ K8S_YAML_DIR }}/helm-rbac.yaml"
   ignore_errors: true
 
 - name: 安装tiller
   shell: "{{ BIN_DIR }}/helm init \
-        --tiller-tls \
-        --tiller-tls-verify \
-        --tiller-tls-cert {{ CA_DIR }}/{{ tiller_cert_cn }}.pem \
-        --tiller-tls-key {{ CA_DIR }}/{{ tiller_cert_cn }}-key.pem \
-        --tls-ca-cert {{ CA_DIR }}/ca.pem \
+        --upgrade --force-upgrade \
         --service-account {{ tiller_sa }} \
         --tiller-namespace {{ helm_namespace }} \
         --tiller-image {{ tiller_image }} \
         --stable-repo-url {{ repo_url }}"
   ignore_errors: true
 
-- name: 配置helm客户端
-  shell: "cp -f {{ CA_DIR }}/ca.pem ~/.helm/ca.pem && \
-          cp -f {{ CA_DIR }}/{{ helm_cert_cn }}.pem ~/.helm/cert.pem && \
-          cp -f {{ CA_DIR }}/{{ helm_cert_cn }}-key.pem ~/.helm/key.pem"
-  ignore_errors: true
-
-# 为方便与tiller进行安全通信，启用helm tls环境变量；仅支持helm v2.11.0及以上版本
-- name: 配置helm tls环境变量
-  lineinfile:
-    dest: ~/.bashrc
-    state: present
-    regexp: "helm tls environment"
-    line: "export HELM_TLS_ENABLE=true"
+- name: 以轮询的方式等待helm服务启动完成
+  command: "{{ BASE_HELM_DIR }}/helm ls"
+  register: result
+  until:    result.rc == 0
+  retries:  5
+  delay: 6
+  delegate_to: "{{ groups.deploy[0] }}"
+  run_once: True
