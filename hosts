@@ -20,15 +20,15 @@ k8s-master2 ansible_host=192.168.3.222 ansible_ssh_port=22 ansible_user=root LB_
 k8s-master3 ansible_host=192.168.3.223 ansible_ssh_port=22 ansible_user=root LB_ROLE=backup
 
 [kube-node]
-k8s-node1 ansible_host=192.168.3.224 ansible_ssh_port=22 ansible_user=root
-k8s-node2 ansible_host=192.168.3.225 ansible_ssh_port=22 ansible_user=root
+#k8s-node1 ansible_host=192.168.3.224 ansible_ssh_port=22 ansible_user=root
+#k8s-node2 ansible_host=192.168.3.225 ansible_ssh_port=22 ansible_user=root
 
 # 参数 NEW_INSTALL：yes表示新建，no表示使用已有harbor服务器
 [harbor]
 #192.168.1.8 HARBOR_DOMAIN="harbor.yourdomain.com" NEW_INSTALL=no
 
 [harbor]
-#k8s-helm ansible_host=192.168.3.228 ansible_ssh_port=22 ansible_user=root
+#k8s-helm ansible_host=192.168.0.228 ansible_ssh_port=22 ansible_user=root
 
 # 预留组，后续添加master节点使用
 [new-master]
@@ -36,7 +36,7 @@ k8s-node2 ansible_host=192.168.3.225 ansible_ssh_port=22 ansible_user=root
 
 # 预留组，后续添加node节点使用
 [new-node]
-k8s-node2 ansible_host=192.168.3.225 ansible_ssh_port=22 ansible_user=root
+k8s-node3 ansible_host=192.168.3.226 ansible_ssh_port=22 ansible_user=root
 
 [all:vars]
 # ---------集群主要参数---------------

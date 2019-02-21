@@ -1,14 +1,6 @@
-down/*
-!down/download.sh
-!down/offline_images
-
 # k8s binaries directory
 bin/*
 !bin/readme.md
-
-# k8s storage manifests 
-manifests/storage/*
-!manifests/storage/test.yaml
 
 # k8s backup directory
 roles/cluster-backup/files/*

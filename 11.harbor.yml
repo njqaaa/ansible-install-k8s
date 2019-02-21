@@ -28,10 +28,3 @@
   - name: Installing the HARBOR SERVER's cert on k8s nodes
     copy: src={{ BASE_DIR }}/down/ca.pem dest={{ DOCKER_DIR }}/certs.d/{{ harbor_domain }}/ca.crt
 
-  # [optional] if you have a DNS server, add an 'A record' instead
-  - name: Adding an '/etc/hosts' entry for the HARBOR DOMAIN
-    lineinfile:
-      dest: /etc/hosts
-      state: present
-      regexp: '{{ harbor_domain }}'
-      line: "{{ groups['harbor'][0] }} {{ harbor_domain }}"

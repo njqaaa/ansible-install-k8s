@@ -9,6 +9,10 @@
   - "{{ CA_DIR }}"
   - /root/.kube
 
+- name: 分发hosts文件至k8s集群服务器
+  copy: src=etchosts dest=/etc/hosts mode=0644
+  tags: upgrade_k8s
+
 - name: 分发证书工具 CFSSL
   copy: src={{ BASE_CFSSL_DIR }}/{{ item }} dest={{ BIN_DIR }}/{{ item }} mode=0755
   with_items:
