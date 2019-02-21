@@ -1,0 +1,110 @@
+# 集群部署节点：一般为运行ansible 脚本的节点
+[deploy]
+192.168.0.97
+
+# etcd集群请提供如下NODE_NAME，注意etcd集群必须是1,3,5,7...奇数个节点
+[etcd]
+k8s-etcd1 ansible_host=192.168.3.226 ansible_ssh_port=22 ansible_user=root
+k8s-etcd2 ansible_host=192.168.3.227 ansible_ssh_port=22 ansible_user=root
+k8s-etcd3 ansible_host=192.168.3.228 ansible_ssh_port=22 ansible_user=root
+
+[kube-master]
+k8s-master1 ansible_host=192.168.3.221 ansible_ssh_port=22 ansible_user=root
+k8s-master2 ansible_host=192.168.3.222 ansible_ssh_port=22 ansible_user=root
+k8s-master3 ansible_host=192.168.3.223 ansible_ssh_port=22 ansible_user=root
+
+# 负载均衡(目前已支持多于2节点，一般2节点就够了) 安装 haproxy+keepalived
+[lb]
+k8s-master1 ansible_host=192.168.3.221 ansible_ssh_port=22 ansible_user=root LB_ROLE=master
+k8s-master2 ansible_host=192.168.3.222 ansible_ssh_port=22 ansible_user=root LB_ROLE=backup
+k8s-master3 ansible_host=192.168.3.223 ansible_ssh_port=22 ansible_user=root LB_ROLE=backup
+
+[kube-node]
+k8s-node1 ansible_host=192.168.3.224 ansible_ssh_port=22 ansible_user=root
+k8s-node2 ansible_host=192.168.3.225 ansible_ssh_port=22 ansible_user=root
+
+# 参数 NEW_INSTALL：yes表示新建，no表示使用已有harbor服务器
+[harbor]
+#192.168.1.8 HARBOR_DOMAIN="harbor.yourdomain.com" NEW_INSTALL=no
+
+[harbor]
+#k8s-helm ansible_host=192.168.3.228 ansible_ssh_port=22 ansible_user=root
+
+# 预留组，后续添加master节点使用
+[new-master]
+#192.168.1.5
+
+# 预留组，后续添加node节点使用
+[new-node]
+k8s-node2 ansible_host=192.168.3.225 ansible_ssh_port=22 ansible_user=root
+
+[all:vars]
+# ---------集群主要参数---------------
+#集群部署模式：allinone, single-master, multi-master
+DEPLOY_MODE=multi-master
+
+#集群主版本号，目前支持: v1.8, v1.9, v1.10，v1.11, v1.12
+K8S_VER="v1.11.6"
+
+# 集群 MASTER IP即 LB节点VIP地址，为区别与默认apiserver端口，设置VIP监听的服务端口8443
+# 公有云上请使用云负载均衡内网地址和监听端口
+MASTER_IP="192.168.3.229"
+KUBE_APISERVER="https://{{ MASTER_IP }}:8443"
+
+# 集群网络插件，目前支持calico, flannel, kube-router, cilium
+CLUSTER_NETWORK="calico"
+
+# 服务网段 (Service CIDR），注意不要与内网已有网段冲突
+SERVICE_CIDR="10.68.0.0/16"
+
+# POD 网段 (Cluster CIDR），注意不要与内网已有网段冲突
+CLUSTER_CIDR="172.20.0.0/16"
+
+# 服务端口范围 (NodePort Range)
+NODE_PORT_RANGE="20000-40000"
+
+# kubernetes 服务 IP (预分配，一般是 SERVICE_CIDR 中第一个IP)
+CLUSTER_KUBERNETES_SVC_IP="10.68.0.1"
+
+# 集群 DNS 服务 IP (从 SERVICE_CIDR 中预分配)
+CLUSTER_DNS_SVC_IP="10.68.0.2"
+
+# 集群 DNS 域名
+CLUSTER_DNS_DOMAIN="cluster.local."
+
+# 集群basic auth 使用的用户名和密码
+BASIC_AUTH_USER="admin"
+BASIC_AUTH_PASS="test1234"
+
+# ------------ ansible目录 ----------------
+BASE_DIR="/etc/ansible"
+BASE_CFSSL_DIR="/etc/ansible/bin/cfssl_bin"
+BASE_CNI_DIR="/etc/ansible/bin/cni_bin"
+BASE_DOCKER_DIR="/etc/ansible/bin/docker_bin"
+BASE_ETCD_DIR="/etc/ansible/bin/etcd_bin"
+BASE_HELM_DIR="/etc/ansible/bin/helm_bin"
+BASE_K8S_DIR="/etc/ansible/bin/k8s_bin"
+
+# ----------- 远程服务器相关参数 ------------
+# 网卡（自动变更）
+K8S_INTERFACE="eth0"
+
+# 默认二进制文件目录
+BIN_DIR="/usr/local/bin"
+
+# 证书目录
+CA_DIR="/etc/kubernetes/ssl"
+ETCD_CA_DIR="/etc/etcd/ssl"
+CALICO_CA_DIR="/etc/calico/ssl"
+
+# 常规目录
+K8S_DIR="/etc/kubernetes"
+K8S_YAML_DIR="/etc/kubernetes_yaml"
+ETCD_DIR="/etc/etcd"
+
+SYSTEMD_DIR="/etc/systemd/system"
+
+# 网络
+CNI_NET_DIR="/etc/cni/net.d"
+
+DOCKER_DIR="/etc/docker"
