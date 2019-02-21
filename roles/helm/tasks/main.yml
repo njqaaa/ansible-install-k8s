@@ -1,9 +1,9 @@
-- name: 下载helm客户端
-  copy: src={{ BASE_HELM_DIR }}/helm dest={{ BIN_DIR }}/helm mode=0755
-
-- name: 自动补全
-  shell: echo "source <(helm completion bash)" > /etc/profile.d/helm.sh
-
+#- name: 下载helm客户端
+#  copy: src={{ BASE_HELM_DIR }}/helm dest={{ BIN_DIR }}/helm mode=0755
+#
+#- name: 自动补全
+#  shell: echo "source <(helm completion bash)" > /etc/profile.d/helm.sh
+#
 - name: 准备rbac配置
   template: src=helm-rbac.yaml.j2 dest={{ K8S_YAML_DIR }}/helm-rbac.yaml
 

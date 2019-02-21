@@ -6,9 +6,6 @@ down/*
 bin/*
 !bin/readme.md
 
-# ansible hosts
-hosts
-
 # k8s storage manifests 
 manifests/storage/*
 !manifests/storage/test.yaml
