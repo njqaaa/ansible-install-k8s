@@ -36,15 +36,15 @@ k8s-master3 ansible_host=192.168.3.223 ansible_ssh_port=22 ansible_user=root LB_
 
 # 预留组，后续添加node节点使用
 [new-node]
-k8s-node3 ansible_host=192.168.3.226 ansible_ssh_port=22 ansible_user=root
+#k8s-node3 ansible_host=192.168.3.226 ansible_ssh_port=22 ansible_user=root
 
 [all:vars]
 # ---------集群主要参数---------------
 #集群部署模式：allinone, single-master, multi-master
 DEPLOY_MODE=multi-master
 
-#集群主版本号，目前支持: v1.8, v1.9, v1.10，v1.11, v1.12
-K8S_VER="v1.11.6"
+# 镜像版本，可选版本号详见：https://hub.docker.com/r/njqaaa/k8s-package/tags
+K8S_VER="v1.11.7"
 
 # 集群 MASTER IP即 LB节点VIP地址，为区别与默认apiserver端口，设置VIP监听的服务端口8443
 # 公有云上请使用云负载均衡内网地址和监听端口

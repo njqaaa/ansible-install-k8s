@@ -36,10 +36,9 @@ function checkSsh() {
     fi
 }
 
-# 镜像版本，可选版本号详见：https://hub.docker.com/r/njqaaa/k8s-package/tags
-k8s_version="v1.11.6"
 base_path=$(cd `dirname $0`; pwd)
 hosts_file=${base_path}/etchosts
+k8s_version=$(cat hosts |grep K8S_VER |awk -F '"' '{print $2}')
 
 if [[ ${base_path} != "/etc/ansible" ]];then
     echo "请mv本仓库至/etc/，并重命名为ansible"
