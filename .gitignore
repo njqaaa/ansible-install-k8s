@@ -12,3 +12,6 @@ roles/cluster-backup/files/*
 
 # cluster backups
 .cluster/
+
+# other
+etchosts

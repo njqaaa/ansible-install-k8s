@@ -4,16 +4,16 @@
   - deploy
 
 #  [optional] to install loadbalance service, only needed by multi-master cluster 
-- hosts: lb
-  roles:
-  - lb
-
+#- hosts: lb
+#  roles:
+#  - lb
+#
 # prepare tasks for all nodes
 - hosts:
   - kube-master
   - kube-node
   - etcd
-  - lb
+#  - lb
   roles:
   - prepare
 

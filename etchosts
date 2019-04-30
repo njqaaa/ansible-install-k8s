@@ -1,8 +1,7 @@
 127.0.0.1 localhost localhost.localdomain
-192.168.3.226 k8s-etcd1
-192.168.3.227 k8s-etcd2
-192.168.3.228 k8s-etcd3
-192.168.3.221 k8s-master1
-192.168.3.222 k8s-master2
-192.168.3.223 k8s-master3
-192.168.3.226 k8s-node3
+192.168.2.219 k8s-master1
+192.168.2.218 k8s-master2
+192.168.2.217 k8s-master3
+192.168.2.216 k8s-node1
+192.168.2.215 k8s-node2
+192.168.2.214 k8s-node3

@@ -2,6 +2,9 @@
 - import_tasks: centos.yml
   when: ansible_distribution == "CentOS"
 
+- name: add /usr/local/bin
+  shell: echo export PATH=$PATH:/usr/local/bin > /etc/profile.d/env-path.sh
+
 - name: prepare some dirs
   file: name={{ item }} state=directory
   with_items:

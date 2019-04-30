@@ -4,24 +4,25 @@
 
 # etcd集群请提供如下NODE_NAME，注意etcd集群必须是1,3,5,7...奇数个节点
 [etcd]
-k8s-etcd1 ansible_host=192.168.3.226 ansible_ssh_port=22 ansible_user=root
-k8s-etcd2 ansible_host=192.168.3.227 ansible_ssh_port=22 ansible_user=root
-k8s-etcd3 ansible_host=192.168.3.228 ansible_ssh_port=22 ansible_user=root
+k8s-master1 ansible_host=192.168.2.219 ansible_ssh_port=22 ansible_user=root
+k8s-master2 ansible_host=192.168.2.218 ansible_ssh_port=22 ansible_user=root
+k8s-master3 ansible_host=192.168.2.217 ansible_ssh_port=22 ansible_user=root
 
 [kube-master]
-k8s-master1 ansible_host=192.168.3.221 ansible_ssh_port=22 ansible_user=root
-k8s-master2 ansible_host=192.168.3.222 ansible_ssh_port=22 ansible_user=root
-k8s-master3 ansible_host=192.168.3.223 ansible_ssh_port=22 ansible_user=root
+k8s-master1 ansible_host=192.168.2.219 ansible_ssh_port=22 ansible_user=root
+k8s-master2 ansible_host=192.168.2.218 ansible_ssh_port=22 ansible_user=root
+k8s-master3 ansible_host=192.168.2.217 ansible_ssh_port=22 ansible_user=root
 
 # 负载均衡(目前已支持多于2节点，一般2节点就够了) 安装 haproxy+keepalived
-[lb]
-k8s-master1 ansible_host=192.168.3.221 ansible_ssh_port=22 ansible_user=root LB_ROLE=master
-k8s-master2 ansible_host=192.168.3.222 ansible_ssh_port=22 ansible_user=root LB_ROLE=backup
-k8s-master3 ansible_host=192.168.3.223 ansible_ssh_port=22 ansible_user=root LB_ROLE=backup
+#[lb]
+#k8s-master1 ansible_host=192.168.2.216 ansible_ssh_port=22 ansible_user=root LB_ROLE=master
+#k8s-master2 ansible_host=192.168.2.215 ansible_ssh_port=22 ansible_user=root LB_ROLE=backup
+#k8s-master3 ansible_host=192.168.2.214 ansible_ssh_port=22 ansible_user=root LB_ROLE=backup
 
 [kube-node]
-#k8s-node1 ansible_host=192.168.3.224 ansible_ssh_port=22 ansible_user=root
-#k8s-node2 ansible_host=192.168.3.225 ansible_ssh_port=22 ansible_user=root
+k8s-node1 ansible_host=192.168.2.216 ansible_ssh_port=22 ansible_user=root
+k8s-node2 ansible_host=192.168.2.215 ansible_ssh_port=22 ansible_user=root
+k8s-node3 ansible_host=192.168.2.214 ansible_ssh_port=22 ansible_user=root
 
 # 参数 NEW_INSTALL：yes表示新建，no表示使用已有harbor服务器
 [harbor]
@@ -36,7 +37,7 @@ k8s-master3 ansible_host=192.168.3.223 ansible_ssh_port=22 ansible_user=root LB_
 
 # 预留组，后续添加node节点使用
 [new-node]
-#k8s-node3 ansible_host=192.168.3.226 ansible_ssh_port=22 ansible_user=root
+#k8s-node3 ansible_host=192.168.2.219 ansible_ssh_port=22 ansible_user=root
 
 [all:vars]
 # ---------集群主要参数---------------
@@ -44,11 +45,11 @@ k8s-master3 ansible_host=192.168.3.223 ansible_ssh_port=22 ansible_user=root LB_
 DEPLOY_MODE=multi-master
 
 # 镜像版本，可选版本号详见：https://hub.docker.com/r/njqaaa/k8s-package/tags
-K8S_VER="v1.11.7"
+K8S_VER="v1.11.9"
 
 # 集群 MASTER IP即 LB节点VIP地址，为区别与默认apiserver端口，设置VIP监听的服务端口8443
 # 公有云上请使用云负载均衡内网地址和监听端口
-MASTER_IP="192.168.3.229"
+MASTER_IP="192.168.2.190"
 KUBE_APISERVER="https://{{ MASTER_IP }}:8443"
 
 # 集群网络插件，目前支持calico, flannel, kube-router, cilium

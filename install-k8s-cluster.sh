@@ -23,17 +23,31 @@ function checkAlive() {
     until ansible all -u root -m shell -a 'w' 2>&1; do sleep 5; printf "."; done
 }
 
+function checkIfOk(){
+    if [[ $? -ne 0 ]];then
+        echo "error"
+        exit 1
+    fi
+}
 function installK8s(){
     # 如内核版本为3.1*，则会升级内核，并重启所有节点
-    ansible-playbook 01.prepare.yml
-    checkAlive
-    ansible-playbook 02.etcd.yml
-    ansible-playbook 03.docker.yml
+    #ansible-playbook 01.prepare.yml
+    checkIfOk
+    #checkAlive
+    #ansible-playbook 02.etcd.yml
+    checkIfOk
+    #ansible-playbook 03.docker.yml
+    checkIfOk
     ansible-playbook 04.kube-master.yml
+    checkIfOk
     ansible-playbook 05.kube-node.yml
+    checkIfOk
     ansible-playbook 06.network.yml
+    checkIfOk
     ansible-playbook 07.cluster-addon.yml
-    ansible-playbook 12.helm.yml
+    checkIfOk
+    #ansible-playbook 12.helm.yml
+    #checkIfOk
 }
 
 pullImage
