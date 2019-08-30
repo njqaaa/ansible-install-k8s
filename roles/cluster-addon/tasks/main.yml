@@ -1,4 +1,7 @@
 - block:
+    - name: 下载kubectl
+      copy: src={{ BASE_K8S_DIR }}/kubectl dest={{ BIN_DIR }}/helm mode=0755
+
     - name: 在deploy 节点创建相关目录
       file: path={{ item }} state=directory
       with_items:
