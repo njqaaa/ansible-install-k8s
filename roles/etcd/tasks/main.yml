@@ -33,12 +33,8 @@
   template: src=etcd.service.j2 dest={{ SYSTEMD_DIR }}/etcd.service
   tags: upgrade_etcd
 
-- name: 开机启用etcd服务
-  shell: systemctl enable etcd
-  ignore_errors: true
-
 - name: 开启etcd服务
-  shell: systemctl daemon-reload && systemctl restart etcd
+  shell: systemctl daemon-reload && systemctl enable etcd && systemctl restart etcd
   ignore_errors: true
   tags: upgrade_etcd
 

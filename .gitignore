@@ -10,8 +10,7 @@ roles/cluster-backup/files/*
 /roles/*/vars/*
 !/roles/os-harden/vars/
 
+
 # cluster backups
 .cluster/
 
-# other
-etchosts

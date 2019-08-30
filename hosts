@@ -4,23 +4,23 @@
 
 # etcd集群请提供如下NODE_NAME，注意etcd集群必须是1,3,5,7...奇数个节点
 [etcd]
-k8s-master1 ansible_host=10.111.64.120 ansible_ssh_port=16300 ansible_user=root
-k8s-master2 ansible_host=10.111.64.121 ansible_ssh_port=16300 ansible_user=root
-k8s-master3 ansible_host=10.111.64.122 ansible_ssh_port=16300 ansible_user=root
+k8s-master-1 ansible_host=10.111.64.120 ansible_ssh_port=16300 ansible_user=root
+k8s-master-2 ansible_host=10.111.64.121 ansible_ssh_port=16300 ansible_user=root
+k8s-master-3 ansible_host=10.111.64.122 ansible_ssh_port=16300 ansible_user=root
 
 [kube-master]
-k8s-master1 ansible_host=10.111.64.120 ansible_ssh_port=16300 ansible_user=root
-k8s-master2 ansible_host=10.111.64.121 ansible_ssh_port=16300 ansible_user=root
-k8s-master3 ansible_host=10.111.64.122 ansible_ssh_port=16300 ansible_user=root
+k8s-master-1 ansible_host=10.111.64.120 ansible_ssh_port=16300 ansible_user=root
+k8s-master-2 ansible_host=10.111.64.121 ansible_ssh_port=16300 ansible_user=root
+k8s-master-3 ansible_host=10.111.64.122 ansible_ssh_port=16300 ansible_user=root
 
 # 负载均衡(目前已支持多于2节点，一般2节点就够了) 安装 haproxy+keepalived
 #[lb]
-#k8s-master1 ansible_host=10.111.51.35 ansible_ssh_port=16300 ansible_user=root LB_ROLE=master
-#k8s-master2 ansible_host=10.111.51.36 ansible_ssh_port=16300 ansible_user=root LB_ROLE=backup
+#k8s-master-1 ansible_host=10.111.51.35 ansible_ssh_port=16300 ansible_user=root LB_ROLE=master
+#k8s-master-2 ansible_host=10.111.51.36 ansible_ssh_port=16300 ansible_user=root LB_ROLE=backup
 
 [kube-node]
-k8s-node1 ansible_host=10.111.51.35 ansible_ssh_port=16300 ansible_user=root
-k8s-node2 ansible_host=10.111.51.36 ansible_ssh_port=16300 ansible_user=root
+k8s-node-1 ansible_host=10.111.51.35 ansible_ssh_port=16300 ansible_user=root
+k8s-node-2 ansible_host=10.111.51.36 ansible_ssh_port=16300 ansible_user=root
 
 # 参数 NEW_INSTALL：yes表示新建，no表示使用已有harbor服务器
 [harbor]
@@ -35,7 +35,7 @@ k8s-node2 ansible_host=10.111.51.36 ansible_ssh_port=16300 ansible_user=root
 
 # 预留组，后续添加node节点使用
 [new-node]
-#k8s-node3 ansible_host=10.111.64.120 ansible_ssh_port=16300 ansible_user=root
+#k8s-node-3 ansible_host=10.111.64.120 ansible_ssh_port=16300 ansible_user=root
 
 [all:vars]
 # ---------集群主要参数---------------
@@ -51,7 +51,7 @@ MASTER_IP="10.111.140.190"
 KUBE_APISERVER="https://{{ MASTER_IP }}:8443"
 
 # 集群网络插件，目前支持calico, flannel, kube-router, cilium
-CLUSTER_NETWORK="calico"
+CLUSTER_NETWORK="canal"
 
 # 服务网段 (Service CIDR），注意不要与内网已有网段冲突
 SERVICE_CIDR="10.68.0.0/16"
