@@ -29,6 +29,7 @@ ExecStart={{ BIN_DIR }}/kubelet \
   --root-dir={{ KUBELET_ROOT_DIR }} \
   --tls-cert-file={{ CA_DIR }}/kubelet.pem \
   --tls-private-key-file={{ CA_DIR }}/kubelet-key.pem \
+  --enable-controller-attach-detach=false \
   --v=2
 #kubelet cAdvisor 默认在所有接口监听 4194 端口的请求, 以下iptables限制内网访问
 ExecStartPost=/sbin/iptables -A INPUT -s 10.0.0.0/8 -p tcp --dport 4194 -j ACCEPT

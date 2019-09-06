@@ -24,9 +24,6 @@ k8s-node-2 ansible_host=10.111.51.36 ansible_ssh_port=16300 ansible_user=root
 
 # 参数 NEW_INSTALL：yes表示新建，no表示使用已有harbor服务器
 [harbor]
-#192.168.1.8 HARBOR_DOMAIN="harbor.yourdomain.com" NEW_INSTALL=no
-
-[harbor]
 #k8s-helm ansible_host=192.168.0.228 ansible_ssh_port=16300 ansible_user=root
 
 # 预留组，后续添加master节点使用
@@ -35,7 +32,7 @@ k8s-node-2 ansible_host=10.111.51.36 ansible_ssh_port=16300 ansible_user=root
 
 # 预留组，后续添加node节点使用
 [new-node]
-#k8s-node-3 ansible_host=10.111.64.120 ansible_ssh_port=16300 ansible_user=root
+k8s-node-3 ansible_host=10.111.51.34 ansible_ssh_port=16300 ansible_user=root
 
 [all:vars]
 # ---------集群主要参数---------------
