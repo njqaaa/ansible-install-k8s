@@ -15,8 +15,5 @@
   - "kernel-ml"
   when: "'3.1' in kversion.stdout"
   ignore_errors: true
-
-- name: update kernel && reboot
-  shell: grub2-set-default 0 \
-         && reboot
-  when: "'3.1' in kversion.stdout"
+  notify:
+    update kernel && reboot 

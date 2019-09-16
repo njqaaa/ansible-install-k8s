@@ -1,0 +1,4 @@
+- name: update kernel && reboot
+  shell: pwd
+#  shell: grub2-set-default 0 \
+#         && reboot
